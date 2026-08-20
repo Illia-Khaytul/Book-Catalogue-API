@@ -21,6 +21,7 @@ Exceptions thrown by the application.
 ## 2. Application exception handling
 
 All exceptions return a common `error response` to keep the format consistent.
+
 Fields:
 - Instant `timestamp`: when was the response sent
 - int `status`: the status code
@@ -34,31 +35,43 @@ Fields:
 **Invalid password exception handler** -> 400 Bad Request
 
 **User not authenticated exception handler** -> 401 Unauthorized
+
 `message` = User is not authenticated
 
 **MethodArgumentNotValidException handler** -> 400 Bad Request
+
 `message` = Invalid payload parameters
+
 `data` = validation errors
 
 **ConstraintViolationException handler** -> 400 Bad Request
+
 `message` = Invalid request parameters
+
 `data` = validation errors
 
 **OptimisticLockException handler** -> 409 Conflict
+
 `message` = Concurrent modification error
 
 **NoResourceFoundException handler** -> 404 Not Found
+
 `message` = Resource not found
 
 **Generic exception handler** -> 500 Internal Server Error
+
 Catches any other unexpected exception and logs the stack trace
+
 `message` = Something went wrong
 
 ### 2.1. Special cases
 
 **DataIntegrityViolationException handler:**
+
 Local to the book controller.
+
 If `DataIntegrityViolationException` was caused by a database unique constraint violation -> 409 Conflict
+
 Otherwise -> 500 Internal Server Error
 
 If a database constraint is violated (uniqueness, type, etc.) Spring wraps the thrown exception into a generic DataIntegrityViolationException.

@@ -15,6 +15,7 @@ Create a simple rest api for book management with basic username-password authen
 ## 3. Entities
 
 `Book` entity to persist book data.
+
 `User` entity to persist user data.
 
 ## 4. Operations
@@ -38,4 +39,5 @@ Basic username-password authentication.
 ## 6. Exception
 
 Global `RestControllerAdvice` to handle application exceptions and custom `AuthenticationEntryPoint` to handle security exceptions.
+
 Reusable `ErrorResponse` dto to maintain a consistent exception response structure.

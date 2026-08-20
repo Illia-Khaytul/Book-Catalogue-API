@@ -12,7 +12,7 @@ Entity design.
 - LocalDate `releaseDate`: optional
 - Integer `version`: versioning
 
-**Notes:**
+Notes:
 - Constraint for only one title per author.
 - Versioning field to catch concurrent modification.
 
@@ -22,7 +22,7 @@ Entity design.
 - String `username`: required, unique
 - String `password`: required
 
-**Notes:**
+Notes:
 - Username must be unique.
 - Password is hashed.
 - No versioning since users are barely modified (password change can be performed sequentially for security).

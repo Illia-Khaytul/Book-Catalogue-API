@@ -22,7 +22,7 @@ Creates a new book with provided data and persists it to the database.
 
 **Returns:** `book response`
 
-**Notes:**
+Notes:
 - Requires a transaction so that the duplicate check reads only committed data.
 
 
@@ -39,7 +39,7 @@ Fetches an existing book by provided id and updates its fields with the provided
 
 **Returns:** `book response`
 
-**Notes:**
+Notes:
 - Partial update, if the provided field is null, do not update.
 - Transaction required to catch concurrent modification.
 - Allows 3 retries in case of concurrent modification. Used to load fresh data from the database for a correct partial update.
@@ -56,7 +56,7 @@ Returns an existing book by provided id.
 
 **Returns:** `book response`
 
-**Notes:**
+Notes:
 - Read only transaction.
 
 
@@ -72,7 +72,7 @@ Returns a page of existing books by provided pagination and filters.
 
 **Returns:** `paginated response` for `book response`
 
-**Notes:**
+Notes:
 - Read only transaction.
 
 
@@ -87,7 +87,7 @@ Deletes an existing book by provided id.
 
 **Returns:** nothing
 
-**Notes:**
+Notes:
 - Deletes the book directly without loading it into the peristence context. Requires transacton.
 - No need to check if the book exists (in case it gets deleted mid operation) because the operation deletes it anyways.
 
@@ -111,7 +111,7 @@ Creates a new user with the provided data and persists it to the database.
 
 **Returns:** nothing
 
-**Notes:**
+Notes:
 - Requires transaction to read only committed data from the database.
 
 
@@ -129,7 +129,7 @@ Changes the password of the accessing user.
 
 **Returns:** nothing
 
-**Notes:**
+Notes:
 - Requires serialized transaction to remove concurrency for password change.
 
 
@@ -145,6 +145,6 @@ Deletes the accessing user.
 
 **Returns:** nothing
 
-**Notes:**
+Notes:
 - Deletes user directly without loading it into the persistence context. Requires transaction.
 - No need to check if the user exists (in case the user gets deleted mid operation) because the operation deletes it anyways.
