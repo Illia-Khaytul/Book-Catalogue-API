@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.github.khaytul.illia.book_catalogue_api.book.request.BookFiltering;
-import io.github.khaytul.illia.book_catalogue_api.book.request.BookRegisterRequest;
+import io.github.khaytul.illia.book_catalogue_api.book.request.BookCreateRequest;
 import io.github.khaytul.illia.book_catalogue_api.book.request.BookUpdateRequest;
 import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponse;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.DuplicateEntryException;
@@ -30,8 +30,8 @@ public class BookService {
     }
 
     @Transactional
-    public BookResponse registerBook(BookRegisterRequest request) {
-        log.info("Registering new book with title '{}' by '{}'", request.title(), request.author());
+    public BookResponse createBook(BookCreateRequest request) {
+        log.info("Createing new book with title '{}' by '{}'", request.title(), request.author());
 
         log.debug("Checking if a book with this title and author already exists");
         if(bookRepository.existsByTitleAndAuthor(request.title(), request.author())){
@@ -44,7 +44,7 @@ public class BookService {
         log.debug("Persisting new book");
         book = bookRepository.save(book);
 
-        log.info("New book successfully registered with id {}", book.getId());
+        log.info("New book successfully createed with id {}", book.getId());
 
         return new BookResponse(book);
     }
@@ -95,7 +95,7 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
-    public PaginatedResponse<BookResponse> getManyBooks(Pageable pagination, BookFiltering filtering) {
+    public PaginatedResponse<BookResponse> getBooks(Pageable pagination, BookFiltering filtering) {
         log.info("Getting books with provided pagination and filters");
 
         log.debug("Building filters with provided data");
@@ -113,6 +113,11 @@ public class BookService {
     public void deleteBook(long bookId) {
         log.info("Deleting book with id {}", bookId);
 
+        log.debug("Checking if a book with the provided id exists");
+        if(!bookRepository.existsById(bookId)){
+            throw new EntityNotFoundException("Book with id '%s' does not exist", bookId);
+        }
+
         log.debug("Deleting book");
         bookRepository.deleteBookDirectly(bookId);
 
@@ -123,7 +128,7 @@ public class BookService {
             Helper methods
     */
 
-    public Book createBookFromRequest(BookRegisterRequest request){
+    public Book createBookFromRequest(BookCreateRequest request){
         Book book = new Book();
         book.setTitle(request.title());
         book.setDescription(request.description());

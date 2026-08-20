@@ -62,9 +62,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse methodArgumentNotValidHandler(MethodArgumentNotValidException e){
-        Map<String, String> errors = e.getBindingResult().getAllErrors().stream()
+        Map<String, String> errors = e.getBindingResult().getFieldErrors().stream()
             .collect(Collectors.toMap(
-                error -> error.getObjectName(), 
+                error -> error.getField(), 
                 error -> error.getDefaultMessage()
             ));
 

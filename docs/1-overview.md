@@ -21,14 +21,14 @@ Create a simple rest api for book management with basic username-password authen
 ## 4. Operations
 
 **Book:**
-- Register new book
+- Create book
 - Update book
-- Get one book
-- Get multiple books
+- Get book
+- Get books
 - Delete book
 
 **User:**
-- Register new user
+- Create user
 - Change user password
 - Delete user
 

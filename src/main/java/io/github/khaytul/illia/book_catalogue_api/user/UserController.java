@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.github.khaytul.illia.book_catalogue_api.user.request.PasswordChangeRequest;
-import io.github.khaytul.illia.book_catalogue_api.user.request.UserRegisterRequest;
+import io.github.khaytul.illia.book_catalogue_api.user.request.UserCreateRequest;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/users")
-@Tag(name = "Users", description = "Endpoints to register, change password and delete users.")
+@Tag(name = "Users", description = "Endpoints to create, change password and delete users.")
 @SecurityRequirement(name = "basicAuth")
 public class UserController {
 
@@ -32,7 +32,7 @@ public class UserController {
 
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Register a new user", description = """
+    @Operation(summary = "Create a new user", description = """
         Creates a new user with a unique username and password.
         * Fails with '400 Bad Request' if the provided data is not valid.
         * Fails with '409 Conflict' if the provided username is already taken.
@@ -44,10 +44,10 @@ public class UserController {
         @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
-    public void register(
-        @Valid @RequestBody UserRegisterRequest request
+    public void create(
+        @Valid @RequestBody UserCreateRequest request
     ){
-        userService.register(request);
+        userService.create(request);
     }
 
     @PatchMapping(path = "/password")

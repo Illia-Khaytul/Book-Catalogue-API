@@ -1,6 +1,8 @@
 package io.github.khaytul.illia.book_catalogue_api.openapi;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
@@ -45,11 +47,14 @@ public class OpenApiConfig {
             )
             .addResponses(
                 "book_success_response", 
-                buildApiResponse("BookResponse", "Operation successful", null)
+                buildApiResponse("BookResponse", "Operation successful", new BookResponse(1l, "Good Book Vol.1", "Lorem ipsum dolor sit amet", 
+                    "Original Author", 200, LocalDate.parse("2026-08-15T03:18:59Z")))
             )
             .addResponses(
                 "page_success_response", 
-                buildApiResponse("PaginatedResponse", "Operation successful", null)
+                buildApiResponse("PaginatedResponse", "Operation successful", new PaginatedResponse<>(5, 10, 2, 100, List.of(
+                    new BookResponse(1l, "Good Book Vol.1", "Lorem ipsum dolor sit amet", "Original Author", 200, LocalDate.parse("2020-08-15T03:18:59Z")), 
+                    new BookResponse(1l, "Good Book Vol.2", "Quisque at arcu quis nisi auctor", "Original Author", 205, LocalDate.parse("2022-08-15T03:18:59Z")))))
             )
             .addResponses(
                 "400_response", 
@@ -99,17 +104,10 @@ public class OpenApiConfig {
         }
     }
     
-    private ApiResponse buildApiResponse(String schemaName, String description, ErrorResponse example){
+    private ApiResponse buildApiResponse(String schemaName, String description, Object example){
         MediaType mediaType = new MediaType()
             .schema(new Schema<>().$ref("#/components/schemas/" + schemaName));
         if(example != null){
-            example = new ErrorResponse(
-                Instant.parse("2026-08-15T03:18:59Z"),
-                example.status(),
-                example.message(),
-                example.data()
-            );
-
             mediaType.addExamples(
                 "default",
                 new Example().value(example)
@@ -127,6 +125,15 @@ public class OpenApiConfig {
     }
 
     private ApiResponse buildExceptionApiResponse(String description, ErrorResponse example){
+        if(example != null){
+            example = new ErrorResponse(
+                Instant.parse("2026-08-15T03:18:59Z"),
+                example.status(),
+                example.message(),
+                example.data()
+            );
+        }
+        
         return buildApiResponse("ErrorResponse", description, example);
     }
     

@@ -10,7 +10,7 @@ import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.EntityNot
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.InvalidPasswordException;
 import io.github.khaytul.illia.book_catalogue_api.security.SecurityUtils;
 import io.github.khaytul.illia.book_catalogue_api.user.request.PasswordChangeRequest;
-import io.github.khaytul.illia.book_catalogue_api.user.request.UserRegisterRequest;
+import io.github.khaytul.illia.book_catalogue_api.user.request.UserCreateRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -26,12 +26,12 @@ public class UserService {
     }
 
     @Transactional
-    public void register(UserRegisterRequest request) {
-        log.info("Registering new user with username '{}'", request.username());
+    public void create(UserCreateRequest request) {
+        log.info("Createing new user");
 
         log.debug("Checking if username is not taken");
         if(userRepository.existsByUsername(request.username())){
-            throw new DuplicateEntryException("User with username '%s' already exists", request.username());
+            throw new DuplicateEntryException("User with provided username already exists");
         }
 
         log.debug("Encoding password");
@@ -45,17 +45,17 @@ public class UserService {
         log.debug("Persisting new user");
         user = userRepository.save(user);
 
-        log.info("New user successfully registered with id ", user.getId());
+        log.info("New user successfully createed with id {}", user.getId());
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional
     public void changePassword(PasswordChangeRequest request) {
         log.info("Changing current user's password");
 
         log.debug("Fetching authenticated user");
         String username = SecurityUtils.getAuthenticatedUserDetails().getUsername();
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new EntityNotFoundException("User with username '%s' does not exist", username));
+            .orElseThrow(() -> new EntityNotFoundException("Authenticated user does not exist"));
         
         log.debug("Checking if new password is different from old password");
         if(!passwordEncoder.matches(request.newPassword(), user.getPassword())){

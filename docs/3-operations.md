@@ -4,17 +4,17 @@ Operation definition and enter/return data design.
 
 ## 1. Book operations
 
-1. Register new book
+1. Create book
 2. Update book
-3. Get one book
-4. Get many books
+3. Get book
+4. Get books
 5. Delete book
 
-### 1.1. Register new book
+### 1.1. Create book
 
 Creates a new book with provided data and persists it to the database.
 
-**Receives:** `register request`
+**Receives:** `create request`
 
 **Steps:**
 1. Checks if a book with this title and author already exists. Throws `duplicate exception`.
@@ -42,10 +42,10 @@ Fetches an existing book by provided id and updates its fields with the provided
 Notes:
 - Partial update, if the provided field is null, do not update.
 - Transaction required to catch concurrent modification.
-- Allows 3 retries in case of concurrent modification. Used to load fresh data from the database for a correct partial update.
+- Allows 3 retries in case of concurrent modification. The update is partial, the provided data is not invalid on optimistic locking. Used to load fresh data from the database for a correct partial update instead of failing.
 
 
-### 1.3. Get one book
+### 1.3. Get book
 
 Returns an existing book by provided id.
 
@@ -60,7 +60,7 @@ Notes:
 - Read only transaction.
 
 
-### 1.4. Get many books
+### 1.4. Get books
 
 Returns a page of existing books by provided pagination and filters.
 
@@ -83,6 +83,7 @@ Deletes an existing book by provided id.
 **Receives:** long `bookId`
 
 **Steps:**
+1. Check if the book exists. Throws `not found exception`.
 2. Delete book by id.
 
 **Returns:** nothing
@@ -94,15 +95,15 @@ Notes:
 
 ## 2. User operations
 
-1. Register new user
+1. Create user
 2. Change user password
 3. Delete user
 
-### 2.1. Register new user
+### 2.1. Create user
 
 Creates a new user with the provided data and persists it to the database.
 
-**Receives:** `register request`
+**Receives:** `create request`
 
 **Steps:**
 1. Check if user with provided id already exists. Throws `duplicate exception`.
@@ -130,7 +131,7 @@ Changes the password of the accessing user.
 **Returns:** nothing
 
 Notes:
-- Requires serialized transaction to remove concurrency for password change.
+- Requires transaction to read only committed data from the database.
 
 
 ### 2.3. Delete user

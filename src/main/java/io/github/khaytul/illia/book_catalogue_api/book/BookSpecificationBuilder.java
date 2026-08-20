@@ -24,6 +24,8 @@ public class BookSpecificationBuilder {
         filters.add(withMaxPages(filtering.maxPages()));
         filters.add(releasedAfter(filtering.releasedAfter()));
         filters.add(releasedBefore(filtering.releasedBefore()));
+
+        filters = filters.stream().filter(specification -> specification != null).toList();
         
         return Specification.allOf(filters);
     }

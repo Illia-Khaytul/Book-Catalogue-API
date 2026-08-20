@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.github.khaytul.illia.book_catalogue_api.book.request.BookFiltering;
-import io.github.khaytul.illia.book_catalogue_api.book.request.BookRegisterRequest;
+import io.github.khaytul.illia.book_catalogue_api.book.request.BookCreateRequest;
 import io.github.khaytul.illia.book_catalogue_api.book.request.BookUpdateRequest;
 import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponse;
 import io.github.khaytul.illia.book_catalogue_api.common.pagination.PaginatedResponse;
@@ -52,8 +52,8 @@ public class BookController {
     }
 
     @PostMapping(path = "")
-    @Operation(summary = "Register new book", description = """
-        Registers new book with the provided data, with a unique title per author.
+    @Operation(summary = "Create new book", description = """
+        Creates new book with the provided data, with a unique title per author.
         * Fails with '400 Bad Request' if the provided data is not valid.
         * Fails with '409 Conflict' if a book with the same title and author already exists.
         """)
@@ -64,10 +64,10 @@ public class BookController {
         @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
-    public ResponseEntity<BookResponse> registerBook(
-        @Validated @RequestBody BookRegisterRequest request
+    public ResponseEntity<BookResponse> createBook(
+        @Validated @RequestBody BookCreateRequest request
     ) throws URISyntaxException{
-        BookResponse response = bookService.registerBook(request);
+        BookResponse response = bookService.createBook(request);
 
         return ResponseEntity
             .created(new URI("/books/" + response.id()))
@@ -131,11 +131,11 @@ public class BookController {
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
-    public PaginatedResponse<BookResponse> getManyBooks(
+    public PaginatedResponse<BookResponse> getBooks(
         @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC) Pageable pagination,
         @Validated @ModelAttribute BookFiltering filtering
     ){
-        return bookService.getManyBooks(pagination, filtering);
+        return bookService.getBooks(pagination, filtering);
     }
     
     @DeleteMapping(path = "/{bookId}")

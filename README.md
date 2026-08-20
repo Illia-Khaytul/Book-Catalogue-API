@@ -22,20 +22,20 @@ It also implements basic username-password security (http basic) and allows for 
 
 - Java 21+
 - Maven 3.9.19 (or higher)
-- PostgreSQL database (f.e. pgAdmin 4)
+- PostgreSQL database (e.g. pgAdmin 4)
 
 ## 4. Getting Started
 
 First clone the repository to your machine.
 
 ```bash
-git clone https://github.com/Illia-Khaytul/Recipe-Catalogue-API.git
+git clone https://github.com/Illia-Khaytul/Book-Catalogue-API.git
 ```
 
 or
 
 ```bash
-git clone git@github.com:Illia-Khaytul/Recipe-Catalogue-API.git
+git clone git@github.com:Illia-Khaytul/Book-Catalogue-API.git
 ```
 
 Then configure the required environmental variables used in the application. 
@@ -75,7 +75,7 @@ Now the application is available at `http://localhost:8080`
 
 ## 5. API Documentation
 
-The API documentation is automatically with Spring OpenApi.
+The API documentation is automatically generated with Spring OpenApi.
 
 It is available at `http://localhost:8080/swagger-ui/index.html` on the `dev` profile.
 
@@ -84,7 +84,7 @@ It is available at `http://localhost:8080/swagger-ui/index.html` on the `dev` pr
 The application uses a basic username-password authentication method (http basic).
 All endpoints for book operation as well as user password change and deletion require it.
 
-To access the endpoints it is required to register a new user with a unique username (see `register` operation in the api documentation).
+To access the endpoints it is required to create a new user with a unique username (see `create` operation in the api documentation).
 Then use your username and password to authenticate successfully.
 
 ## 7. Project Structure

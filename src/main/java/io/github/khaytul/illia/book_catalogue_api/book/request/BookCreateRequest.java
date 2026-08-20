@@ -7,7 +7,7 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-public record BookRegisterRequest(
+public record BookCreateRequest(
 
     @NotBlank
     @Size(min = 1, max = 100)

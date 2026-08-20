@@ -4,18 +4,18 @@ Endpoint and response status definition.
 
 ## Book endpoints
 
-1. Register new book
+1. Create book
 2. Update book
-3. Get one book
-4. Get many books
+3. Get book
+4. Get books
 5. Delete book
 
-### Register new book
+### Create book
 
 **POST** `/books`
 
 **Receives:**
-- Body: `register request`
+- Body: `create request`
     - String `title`: required, size 1 to 50
     - String `description`: optional, size 0 tp 1000
     - String `author`: required, size 1 to 50
@@ -58,7 +58,7 @@ Endpoint and response status definition.
     - LocalDate `releaseDate`
 
 
-### Get one book
+### Getks book
 
 **GET** `/books/{bookId}`
 
@@ -76,7 +76,7 @@ Endpoint and response status definition.
     - LocalDate `releaseDate`
 
 
-### Get many books
+### Get books
 
 **GET** `/books`
 
@@ -113,16 +113,16 @@ Endpoint and response status definition.
 
 ## User endpoints
 
-1. Register
+1. Create
 2. Change password
 3. Delete user
 
-### Register
+### Create
 
 **POST** `/users`
 
 **Receives:**
-- Body: `register request`
+- Body: `create request`
     - String `username`: required, size 5 to 50
     - String `password`: required, size 6 to 50
 
