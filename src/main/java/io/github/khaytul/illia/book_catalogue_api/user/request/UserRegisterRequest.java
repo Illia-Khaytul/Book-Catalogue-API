@@ -3,7 +3,7 @@ package io.github.khaytul.illia.book_catalogue_api.user.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record UserRequestDTO(
+public record UserRegisterRequest(
 
     @NotBlank
     @Size(min = 5, max = 50)

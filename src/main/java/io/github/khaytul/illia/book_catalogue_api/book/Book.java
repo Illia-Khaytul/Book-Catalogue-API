@@ -1,6 +1,6 @@
 package io.github.khaytul.illia.book_catalogue_api.book;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,21 +34,19 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = true)
     @Lob
     private String description;
 
-    @Column(name = "author", nullable = false)
+    @Column(nullable = false)
     private String author;
 
-    @Column(name = "pages", nullable = true)
     private Integer pages;
 
-    @Column(name = "release_date", nullable = true)
-    private Date releaseDate;
+    @Column(name = "release_date")
+    private LocalDate releaseDate;
 
     @Version
     private Integer version;

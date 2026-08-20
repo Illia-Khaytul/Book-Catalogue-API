@@ -5,18 +5,18 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 
-public record ExceptionResponseDTO(
+public record ErrorResponse(
     Instant timestamp,
     int status,
     String message,
     Map<String, String> data
 ) {
 
-    public ExceptionResponseDTO(HttpStatus status, String message){
+    public ErrorResponse(HttpStatus status, String message){
         this(Instant.now(), status.value(), message, Map.of());
     }
     
-    public ExceptionResponseDTO(HttpStatus status, String message, Map<String, String> data){
+    public ErrorResponse(HttpStatus status, String message, Map<String, String> data){
         this(Instant.now(), status.value(), message, data);
     }
     

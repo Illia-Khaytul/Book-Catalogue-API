@@ -1,19 +1,19 @@
 package io.github.khaytul.illia.book_catalogue_api.book.response;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import io.github.khaytul.illia.book_catalogue_api.book.Book;
 
-public record BookResponseDTO(
+public record BookResponse(
     Long id,
     String title,
     String description,
     String author,
     Integer pages,
-    Date releaseDate
+    LocalDate releaseDate
 ) {
 
-    public BookResponseDTO(Book book){
+    public BookResponse(Book book){
         this(
             book.getId(), 
             book.getTitle(), 

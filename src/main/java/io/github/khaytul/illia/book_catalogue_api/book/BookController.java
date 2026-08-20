@@ -1,11 +1,18 @@
 package io.github.khaytul.illia.book_catalogue_api.book;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,10 +23,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.github.khaytul.illia.book_catalogue_api.book.request.BookFilterDTO;
-import io.github.khaytul.illia.book_catalogue_api.book.request.BookRequestDTO;
-import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponseDTO;
-import io.github.khaytul.illia.book_catalogue_api.page.PageResponseDTO;
+import io.github.khaytul.illia.book_catalogue_api.book.request.BookFiltering;
+import io.github.khaytul.illia.book_catalogue_api.book.request.BookRegisterRequest;
+import io.github.khaytul.illia.book_catalogue_api.book.request.BookUpdateRequest;
+import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponse;
+import io.github.khaytul.illia.book_catalogue_api.common.pagination.PaginatedResponse;
+import io.github.khaytul.illia.book_catalogue_api.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,19 +36,22 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping(path = "/books")
 @Tag(name = "Books", description = "Endpoints for the standard crud operations on books.")
 @SecurityRequirement(name = "basicAuth")
-@AllArgsConstructor
+@Slf4j
 public class BookController {
 
-    private BookService bookService;
+    private final BookService bookService;
+
+    public BookController(BookService bookService){
+        this.bookService = bookService;
+    }
 
     @PostMapping(path = "")
-    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Register new book", description = """
         Registers new book with the provided data, with a unique title per author.
         * Fails with '400 Bad Request' if the provided data is not valid.
@@ -52,10 +64,14 @@ public class BookController {
         @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
-    public BookResponseDTO registerBook(
-        @Validated(BookRequestDTO.Groups.Register.class) @RequestBody BookRequestDTO newBookData
-    ){
-        return bookService.registerBook(newBookData);
+    public ResponseEntity<BookResponse> registerBook(
+        @Validated @RequestBody BookRegisterRequest request
+    ) throws URISyntaxException{
+        BookResponse response = bookService.registerBook(request);
+
+        return ResponseEntity
+            .created(new URI("/books/" + response.id()))
+            .body(response);
     }
     
     @PatchMapping(path = "/{bookId}")
@@ -75,11 +91,11 @@ public class BookController {
         @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
-    public BookResponseDTO updateBook(
+    public BookResponse updateBook(
         @Valid @PathVariable @Positive long bookId,
-        @Validated(BookRequestDTO.Groups.Update.class) @RequestBody BookRequestDTO newBookData
+        @Validated @RequestBody BookUpdateRequest request
     ){
-        return bookService.updateBook(bookId, newBookData);
+        return bookService.updateBook(bookId, request);
     }
     
     @GetMapping(path = "/{bookId}")
@@ -96,7 +112,7 @@ public class BookController {
         @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
-    public BookResponseDTO getBook(
+    public BookResponse getBook(
         @Valid @PathVariable @Positive long bookId
     ){
         return bookService.getBook(bookId);
@@ -115,11 +131,11 @@ public class BookController {
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
-    public PageResponseDTO<BookResponseDTO> getManyBooks(
+    public PaginatedResponse<BookResponse> getManyBooks(
         @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC) Pageable pagination,
-        @Validated @ModelAttribute BookFilterDTO bookFilterData
+        @Validated @ModelAttribute BookFiltering filtering
     ){
-        return bookService.getManyBooks(pagination, bookFilterData);
+        return bookService.getManyBooks(pagination, filtering);
     }
     
     @DeleteMapping(path = "/{bookId}")
@@ -127,17 +143,45 @@ public class BookController {
     @Operation(summary = "Delete book", description = """
         Deletes an existing book by id.
         * Fails with '400 Bad Request' if the provided book id is not positive.
+        * Fails with '404 Not Found' if a book with the provided id does not exist.
         """)
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Operation successful"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
+        @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
     public void deleteBook(
         @Valid @PathVariable @Positive long bookId
     ){
         bookService.deleteBook(bookId);
+    }
+
+    /*
+            Local exception handling
+    */
+   
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> dataIntegrityViolationHandler(DataIntegrityViolationException e){
+        Throwable cause = e.getCause();
+        if(cause != null && cause instanceof ConstraintViolationException constraintViolation){
+            log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
+
+            return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(
+                    HttpStatus.CONFLICT,
+                    "A book with this title and author already exists"
+                ));
+        }
+        
+        return ResponseEntity
+            .internalServerError()
+            .body(new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR, 
+                "Something went wrong"
+            ));
     }
     
 }

@@ -1,30 +1,31 @@
 package io.github.khaytul.illia.book_catalogue_api.book.request;
 
-import java.util.Date;
+import java.time.LocalDate;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-public record BookFilterDTO(
-    
+public record BookRegisterRequest(
+
+    @NotBlank
     @Size(min = 1, max = 100)
-    String titleContains,
+    String title,
 
+    @Size(max = 1000)
+    String description,
+
+    @NotBlank
     @Size(min = 1, max = 50)
-    String authorName,
+    String author,
 
     @PositiveOrZero
-    Integer minPages,
-
-    @PositiveOrZero
-    Integer maxPages,
-
-    Date releasedBefore,
+    Integer pages,
 
     @PastOrPresent
-    Date releasedAfter
-    
+    LocalDate releaseDate
+
 ) {
     
 }

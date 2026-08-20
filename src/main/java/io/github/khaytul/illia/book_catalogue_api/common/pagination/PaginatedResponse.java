@@ -1,10 +1,10 @@
-package io.github.khaytul.illia.book_catalogue_api.page;
+package io.github.khaytul.illia.book_catalogue_api.common.pagination;
 
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 
-public record PageResponseDTO<T extends Object>(
+public record PaginatedResponse<T extends Object>(
     int page,
     int totalPages,
     int pageSize,
@@ -12,7 +12,7 @@ public record PageResponseDTO<T extends Object>(
     List<T> content
 ) {
 
-    public PageResponseDTO(Page<T> page){
+    public PaginatedResponse(Page<T> page){
         this(page.getNumber(), page.getTotalPages(), page.getSize(), page.getTotalElements(), page.getContent());
     }
     

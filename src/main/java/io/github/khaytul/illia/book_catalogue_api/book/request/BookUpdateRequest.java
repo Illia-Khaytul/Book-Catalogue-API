@@ -1,22 +1,19 @@
 package io.github.khaytul.illia.book_catalogue_api.book.request;
 
-import java.util.Date;
+import java.time.LocalDate;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
-public record BookRequestDTO(
+public record BookUpdateRequest(
 
-    @NotBlank(groups = Groups.Register.class)
     @Size(min = 1, max = 100)
     String title,
 
     @Size(max = 1000)
     String description,
 
-    @NotBlank(groups = Groups.Register.class)
     @Size(min = 1, max = 50)
     String author,
 
@@ -24,13 +21,13 @@ public record BookRequestDTO(
     Integer pages,
 
     @PastOrPresent
-    Date releaseDate
+    LocalDate releaseDate
 
 ) {
 
-    public static interface Groups {
-        interface Register{}
-        interface Update{}
+    public boolean isEmpty(){
+        return (title == null || title.isBlank()) && (description == null || description.isBlank()) 
+            && (author == null || author.isBlank()) && pages == null && releaseDate == null;
     }
     
 }

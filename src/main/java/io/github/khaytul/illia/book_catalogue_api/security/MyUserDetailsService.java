@@ -7,13 +7,15 @@ import org.springframework.stereotype.Service;
 
 import io.github.khaytul.illia.book_catalogue_api.user.User;
 import io.github.khaytul.illia.book_catalogue_api.user.UserRepository;
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class MyUserDetailsService implements UserDetailsService{
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public MyUserDetailsService(UserRepository userRepository){
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

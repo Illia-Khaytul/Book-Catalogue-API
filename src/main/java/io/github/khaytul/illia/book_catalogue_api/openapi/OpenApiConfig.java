@@ -5,10 +5,12 @@ import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 
-import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponseDTO;
-import io.github.khaytul.illia.book_catalogue_api.exception.ExceptionResponseDTO;
-import io.github.khaytul.illia.book_catalogue_api.page.PageResponseDTO;
+import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponse;
+import io.github.khaytul.illia.book_catalogue_api.exception.ErrorResponse;
+import io.github.khaytul.illia.book_catalogue_api.common.pagination.PaginatedResponse;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.converter.ResolvedSchema;
@@ -23,6 +25,7 @@ import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 @Configuration
+@Profile("dev")
 public class OpenApiConfig {
 
     @Bean
@@ -42,60 +45,37 @@ public class OpenApiConfig {
             )
             .addResponses(
                 "book_success_response", 
-                buildApiResponse("BookResponseDTO", "Operation successful", null)
+                buildApiResponse("BookResponse", "Operation successful", null)
             )
             .addResponses(
                 "page_success_response", 
-                buildApiResponse("PageResponseDTO", "Operation successful", null)
+                buildApiResponse("PaginatedResponse", "Operation successful", null)
             )
             .addResponses(
                 "400_response", 
-                buildExceptionApiResponse("Invalid parameters", "exception_response_with_data_example")
+                buildExceptionApiResponse("Invalid parameters", new ErrorResponse(HttpStatus.BAD_REQUEST, "Invalid request parameters", 
+                    Map.of("title", "Cannot be null nor empty", "pages", "Must be positive or 0")))
             )
             .addResponses(
                 "401_response", 
-                buildExceptionApiResponse("Authentication failed", "exception_response_example")
+                buildExceptionApiResponse("Authentication failed", new ErrorResponse(HttpStatus.UNAUTHORIZED, "Bad credentials"))
             )
             .addResponses(
                 "404_response", 
-                buildExceptionApiResponse("Entity not found", "exception_response_example")
+                buildExceptionApiResponse("Entity not found", new ErrorResponse(HttpStatus.NOT_FOUND, "Book with id 1 does not exist"))
             )
             .addResponses(
                 "409_response", 
-                buildExceptionApiResponse("Entity parameter conflict", "exception_response_example")
+                buildExceptionApiResponse("Entity parameter conflict", new ErrorResponse(HttpStatus.CONFLICT, "A book with title 'book1' by 'author' already exists"))
             )
             .addResponses(
                 "500_response", 
-                buildExceptionApiResponse("Unexpected error", "exception_response_example")
-            )
-            .addExamples(
-                "exception_response_example",
-                new Example()
-                    .value(new ExceptionResponseDTO(
-                        Instant.parse("2026-08-15T03:18:59Z"),
-                        0,
-                        "string",
-                        Map.of()
-                    ))
-            )
-            .addExamples(
-                "exception_response_with_data_example",
-                new Example()
-                    .value(new ExceptionResponseDTO(
-                        Instant.parse("2026-08-15T03:18:59Z"),
-                        0,
-                        "string",
-                        Map.of(
-                            "data1", "string",
-                            "data2", "string",
-                            "data3", "string"
-                        )
-                    ))
+                buildExceptionApiResponse("Unexpected error", new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong"))
             );
 
-        addSchema(components, BookResponseDTO.class);
-        addSchema(components, PageResponseDTO.class);
-        addSchema(components, ExceptionResponseDTO.class);
+        addSchema(components, BookResponse.class);
+        addSchema(components, PaginatedResponse.class);
+        addSchema(components, ErrorResponse.class);
 
         return components;
     }
@@ -119,13 +99,20 @@ public class OpenApiConfig {
         }
     }
     
-    private ApiResponse buildApiResponse(String schemaName, String description, String exampleName){
+    private ApiResponse buildApiResponse(String schemaName, String description, ErrorResponse example){
         MediaType mediaType = new MediaType()
             .schema(new Schema<>().$ref("#/components/schemas/" + schemaName));
-        if(exampleName != null && !exampleName.isBlank()){
+        if(example != null){
+            example = new ErrorResponse(
+                Instant.parse("2026-08-15T03:18:59Z"),
+                example.status(),
+                example.message(),
+                example.data()
+            );
+
             mediaType.addExamples(
                 "default",
-                new Example().$ref("#/components/examples/" + exampleName)
+                new Example().value(example)
             );
         }
 
@@ -139,8 +126,8 @@ public class OpenApiConfig {
             );
     }
 
-    private ApiResponse buildExceptionApiResponse(String description, String exampleName){
-        return buildApiResponse("ExceptionResponseDTO", description, exampleName);
+    private ApiResponse buildExceptionApiResponse(String description, ErrorResponse example){
+        return buildApiResponse("ErrorResponse", description, example);
     }
     
 }

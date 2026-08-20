@@ -1,34 +1,38 @@
-package io.github.khaytul.illia.book_catalogue_api.exception.handlers;
+package io.github.khaytul.illia.book_catalogue_api.exception;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import io.github.khaytul.illia.book_catalogue_api.exception.ExceptionResponseDTO;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.DuplicateEntryException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.EntityNotFoundException;
+import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.UserNotAuthenticatedException;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.LOWEST_PRECEDENCE)
 @Slf4j
-public class BusinesLogicExceptionHandler {
-
+public class GlobalExceptionHandler {
+    
     @ExceptionHandler(DuplicateEntryException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ExceptionResponseDTO duplicateEntryHandler(DuplicateEntryException e){
+    public ErrorResponse duplicateEntryHandler(DuplicateEntryException e){
         log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
         
-        return new ExceptionResponseDTO(
+        return new ErrorResponse(
             HttpStatus.CONFLICT, 
             e.getMessage()
         );
@@ -36,10 +40,10 @@ public class BusinesLogicExceptionHandler {
     
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ExceptionResponseDTO entityNotFoundHandler(EntityNotFoundException e){
+    public ErrorResponse entityNotFoundHandler(EntityNotFoundException e){
         log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
         
-        return new ExceptionResponseDTO(
+        return new ErrorResponse(
             HttpStatus.NOT_FOUND, 
             e.getMessage()
         );
@@ -47,7 +51,7 @@ public class BusinesLogicExceptionHandler {
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponseDTO methodArgumentNotValidHandler(MethodArgumentNotValidException e){
+    public ErrorResponse methodArgumentNotValidHandler(MethodArgumentNotValidException e){
         Map<String, String> errors = e.getBindingResult().getAllErrors().stream()
             .collect(Collectors.toMap(
                 error -> error.getObjectName(), 
@@ -56,7 +60,7 @@ public class BusinesLogicExceptionHandler {
 
         log.warn("Caught {}: {} - {}", e.getClass().getName(), e.getMessage(), errors);
         
-        return new ExceptionResponseDTO(
+        return new ErrorResponse(
             HttpStatus.BAD_REQUEST, 
             "Invalid payload parameters",
             errors
@@ -65,7 +69,7 @@ public class BusinesLogicExceptionHandler {
     
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExceptionResponseDTO constraintViolationHandler(ConstraintViolationException e){
+    public ErrorResponse constraintViolationHandler(ConstraintViolationException e){
         Map<String, String> errors = e.getConstraintViolations().stream()
             .collect(Collectors.toMap(
                 error -> {
@@ -77,7 +81,7 @@ public class BusinesLogicExceptionHandler {
 
         log.warn("Caught {}: {} - {}", e.getClass().getName(), e.getMessage(), errors);
         
-        return new ExceptionResponseDTO(
+        return new ErrorResponse(
             HttpStatus.BAD_REQUEST, 
             "Invalid request parameters",
             errors
@@ -86,12 +90,56 @@ public class BusinesLogicExceptionHandler {
     
     @ExceptionHandler(OptimisticLockException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ExceptionResponseDTO optimisticLockHandler(OptimisticLockException e){
+    public ErrorResponse optimisticLockHandler(OptimisticLockException e){
         log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
         
-        return new ExceptionResponseDTO(
+        return new ErrorResponse(
             HttpStatus.CONFLICT, 
             "Concurrent modification error"
+        );
+    }
+    
+    @ExceptionHandler(UserNotAuthenticatedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse userNotAuthenticatedHandler(AuthenticationCredentialsNotFoundException e){
+        log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
+        
+        return new ErrorResponse(
+            HttpStatus.UNAUTHORIZED, 
+            "User is not authenticated"
+        );
+    }
+    
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse badCredentialsHandler(BadCredentialsException e){
+        log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
+        
+        return new ErrorResponse(
+            HttpStatus.UNAUTHORIZED, 
+            "Bad credentials"
+        );
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse noResourceFoundHandler(NoResourceFoundException e){
+        log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
+        
+        return new ErrorResponse(
+            HttpStatus.NOT_FOUND, 
+            e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse exceptionHandler(Exception e){
+        log.error("[EXCEPTION] An unexpected exception has occurred", e);
+        
+        return new ErrorResponse(
+            HttpStatus.INTERNAL_SERVER_ERROR, 
+            "Something went wrong"
         );
     }
     

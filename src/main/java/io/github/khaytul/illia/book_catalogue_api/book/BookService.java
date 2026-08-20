@@ -1,92 +1,88 @@
 package io.github.khaytul.illia.book_catalogue_api.book;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import io.github.khaytul.illia.book_catalogue_api.book.request.BookFilterDTO;
-import io.github.khaytul.illia.book_catalogue_api.book.request.BookRequestDTO;
-import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponseDTO;
+import io.github.khaytul.illia.book_catalogue_api.book.request.BookFiltering;
+import io.github.khaytul.illia.book_catalogue_api.book.request.BookRegisterRequest;
+import io.github.khaytul.illia.book_catalogue_api.book.request.BookUpdateRequest;
+import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponse;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.DuplicateEntryException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.EntityNotFoundException;
-import io.github.khaytul.illia.book_catalogue_api.page.PageResponseDTO;
+import io.github.khaytul.illia.book_catalogue_api.common.pagination.PaginatedResponse;
 import jakarta.persistence.OptimisticLockException;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@AllArgsConstructor
 @Slf4j
 public class BookService {
 
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
+    private final BookSpecificationBuilder bookSpecificationBuilder;
 
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public BookResponseDTO registerBook(BookRequestDTO newBookData) {
-        log.info("Registering new book with title '{}' by '{}'", newBookData.title(), newBookData.author());
+    public BookService(BookRepository bookRepository, BookSpecificationBuilder bookSpecificationBuilder){
+        this.bookRepository = bookRepository;
+        this.bookSpecificationBuilder = bookSpecificationBuilder;
+    }
+
+    @Transactional
+    public BookResponse registerBook(BookRegisterRequest request) {
+        log.info("Registering new book with title '{}' by '{}'", request.title(), request.author());
 
         log.debug("Checking if a book with this title and author already exists");
-        if(bookRepository.existsByTitleAndAuthor(newBookData.title(), newBookData.author())){
-            throw new DuplicateEntryException("A book with title '%s' by '%s' already exists", newBookData.title(), newBookData.author());
+        if(bookRepository.existsByTitleAndAuthor(request.title(), request.author())){
+            throw new DuplicateEntryException("A book with title '%s' by '%s' already exists", request.title(), request.author());
         }
 
         log.debug("Creating new book with provided data");
-        Book book = new Book();
-        book.setTitle(newBookData.title());
-        book.setDescription(newBookData.description());
-        book.setAuthor(newBookData.author());
-        book.setPages(newBookData.pages());
-        book.setReleaseDate(newBookData.releaseDate());
+        Book book = createBookFromRequest(request);
 
         log.debug("Persisting new book");
         book = bookRepository.save(book);
 
-        log.info("New book successfully registered");
+        log.info("New book successfully registered with id {}", book.getId());
 
-        return new BookResponseDTO(book);
+        return new BookResponse(book);
     }
 
     @Retryable(includes = OptimisticLockException.class, maxRetries = 3)
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-    public BookResponseDTO updateBook(long bookId, BookRequestDTO newBookData) {
+    @Transactional
+    public BookResponse updateBook(long bookId, BookUpdateRequest request) {
         log.info("Updating book with id {}", bookId);
 
         log.debug("Fetching book by provided id");
         Book book = bookRepository.findById(bookId)
             .orElseThrow(() -> new EntityNotFoundException("Book with id '%s' does not exist", bookId));
         
+        if(request.isEmpty()){
+            log.info("No book fields to update");
+            return new BookResponse(book);
+        }
+        
         log.debug("Checking if a book with the new title and author already exists");
-        String title = newBookData.title() == null ? book.getTitle() : newBookData.title();
-        String author = newBookData.author() == null ? book.getAuthor() : newBookData.author();
+        String title = request.title() == null ? book.getTitle() : request.title();
+        String author = request.author() == null ? book.getAuthor() : request.author();
         if(!(book.getTitle().equals(title) && book.getAuthor().equals(author)) && bookRepository.existsByTitleAndAuthor(title, author)){
             throw new DuplicateEntryException("A book with title '%s' by '%s' already exists", title, author);
         }
 
         log.debug("Updating book with provided data");
-        book.setTitle(title);
-        book.setDescription(newBookData.description() == null ? book.getDescription() : newBookData.description());
-        book.setAuthor(author);
-        book.setPages(newBookData.pages() == null ? book.getPages() : newBookData.pages());
-        book.setReleaseDate(newBookData.releaseDate() == null ? book.getReleaseDate() : newBookData.releaseDate());
+        updateBookFromRequest(book, request);
 
         log.debug("Persisting updated book");
         book = bookRepository.save(book);
 
         log.info("Book successfully updated");
 
-        return new BookResponseDTO(book);
+        return new BookResponse(book);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public BookResponseDTO getBook(long bookId) {
+    @Transactional(readOnly = true)
+    public BookResponse getBook(long bookId) {
         log.info("Getting book with id {}", bookId);
 
         log.debug("Fetching the book by provided id");
@@ -95,51 +91,60 @@ public class BookService {
         
         log.info("Book found successfully");
 
-        return new BookResponseDTO(book);
+        return new BookResponse(book);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, readOnly = true)
-    public PageResponseDTO<BookResponseDTO> getManyBooks(Pageable pagination, BookFilterDTO bookFilterData) {
+    @Transactional(readOnly = true)
+    public PaginatedResponse<BookResponse> getManyBooks(Pageable pagination, BookFiltering filtering) {
         log.info("Getting books with provided pagination and filters");
 
         log.debug("Building filters with provided data");
-        List<Specification<Book>> filters = new ArrayList<>();
-        if(bookFilterData.titleContains() != null && !bookFilterData.titleContains().isEmpty()){
-            filters.add((root, cq, cb) -> cb.like(cb.lower(root.get("title")), "%" + bookFilterData.titleContains().toLowerCase() + "%"));
-        }
-        if(bookFilterData.authorName() != null && !bookFilterData.authorName().isEmpty()){
-            filters.add((root, cq, cb) -> cb.like(cb.lower(root.get("author")), "%" + bookFilterData.authorName().toLowerCase() + "%"));
-        }
-        if(bookFilterData.minPages() != null){
-            filters.add((root, cq, cb) -> cb.greaterThanOrEqualTo(root.get("pages"), bookFilterData.minPages()));
-        }
-        if(bookFilterData.maxPages() != null){
-            filters.add((root, cq, cb) -> cb.lessThanOrEqualTo(root.get("pages"), bookFilterData.maxPages()));
-        }
-        if(bookFilterData.releasedAfter() != null){
-            filters.add((root, cq, cb) -> cb.greaterThanOrEqualTo(root.get("releaseDate"), bookFilterData.releasedAfter()));
-        }
-        if(bookFilterData.releasedBefore() != null){
-            filters.add((root, cq, cb) -> cb.lessThanOrEqualTo(root.get("releaseDate"), bookFilterData.releasedBefore()));
-        }
-        Specification<Book> filter = Specification.allOf(filters);
+        Specification<Book> filter = bookSpecificationBuilder.fromFilter(filtering);
 
         log.debug("Fetching a page of books with provided pagination and filters");
         Page<Book> bookPage = bookRepository.findAll(filter, pagination);
 
         log.info("Successfully found {} books for {} pages", bookPage.getTotalElements(), bookPage.getTotalPages());
 
-        return new PageResponseDTO<>(bookPage.map(BookResponseDTO::new));
+        return new PaginatedResponse<>(bookPage.map(BookResponse::new));
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional
     public void deleteBook(long bookId) {
         log.info("Deleting book with id {}", bookId);
+
+        log.debug("Checking if the book with this id exists");
+        if(!bookRepository.existsById(bookId)){
+            throw new EntityNotFoundException("Book with id '%s' does not exist", bookId);
+        }
 
         log.debug("Deleting book");
         bookRepository.deleteBookDirectly(bookId);
 
         log.info("Book deleted successfully");
+    }
+
+    /*
+            Helper methods
+    */
+
+    public Book createBookFromRequest(BookRegisterRequest request){
+        Book book = new Book();
+        book.setTitle(request.title());
+        book.setDescription(request.description());
+        book.setAuthor(request.author());
+        book.setPages(request.pages());
+        book.setReleaseDate(request.releaseDate());
+
+        return book;
+    }
+
+    public void updateBookFromRequest(Book book, BookUpdateRequest request){
+        book.setTitle(request.title() == null ? book.getTitle() : request.title());
+        book.setDescription(request.description() == null ? book.getDescription() : request.description());
+        book.setAuthor(request.author() == null ? book.getAuthor() : request.author());
+        book.setPages(request.pages() == null ? book.getPages() : request.pages());
+        book.setReleaseDate(request.releaseDate() == null ? book.getReleaseDate() : request.releaseDate());
     }
 
 }

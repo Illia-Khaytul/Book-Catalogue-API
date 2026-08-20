@@ -14,19 +14,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.github.khaytul.illia.book_catalogue_api.user.request.UserPasswordChangeDTO;
-import io.github.khaytul.illia.book_catalogue_api.user.request.UserRequestDTO;
+import io.github.khaytul.illia.book_catalogue_api.user.request.PasswordChangeRequest;
+import io.github.khaytul.illia.book_catalogue_api.user.request.UserRegisterRequest;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping(path = "/users")
 @Tag(name = "Users", description = "Endpoints to register, change password and delete users.")
 @SecurityRequirement(name = "basicAuth")
-@AllArgsConstructor
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService){
+        this.userService = userService;
+    }
 
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
@@ -43,9 +45,9 @@ public class UserController {
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
     public void register(
-        @Valid @RequestBody UserRequestDTO newUserData
+        @Valid @RequestBody UserRegisterRequest request
     ){
-        userService.register(newUserData);
+        userService.register(request);
     }
 
     @PatchMapping(path = "/password")
@@ -61,9 +63,9 @@ public class UserController {
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
     public void changePassword(
-        @Valid @RequestBody UserPasswordChangeDTO passwordChangeData
+        @Valid @RequestBody PasswordChangeRequest request
     ){
-        userService.changePassword(passwordChangeData);
+        userService.changePassword(request);
     }
 
     @DeleteMapping(path = "")
