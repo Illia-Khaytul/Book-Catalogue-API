@@ -1,0 +1,150 @@
+# Operations
+
+Operation definition and enter/return data design.
+
+## 1. Book operations
+
+1. Register new book
+2. Update book
+3. Get one book
+4. Get many books
+5. Delete book
+
+### 1.1. Register new book
+
+Creates a new book with provided data and persists it to the database.
+
+**Receives:** `register request`
+
+**Steps:**
+1. Checks if a book with this title and author already exists. Throws `duplicate exception`.
+2. Creates a new book with the provided data.
+
+**Returns:** `book response`
+
+**Notes:**
+- Requires a transaction so that the duplicate check reads only committed data.
+
+
+### 1.2. Update book
+
+Fetches an existing book by provided id and updates its fields with the provided data.
+
+**Receives:** long `bookId` and `update request`
+
+**Steps:**
+1. Fetch book by id. If not found throws `not found exception`.
+2. Check if a book with the new title and author already exists. Throws `duplicate exception`.
+3. Updates book with provided data.
+
+**Returns:** `book response`
+
+**Notes:**
+- Partial update, if the provided field is null, do not update.
+- Transaction required to catch concurrent modification.
+- Allows 3 retries in case of concurrent modification. Used to load fresh data from the database for a correct partial update.
+
+
+### 1.3. Get one book
+
+Returns an existing book by provided id.
+
+**Receives:** long `bookId`
+
+**Steps:**
+1. Fetch book by id. If not found throws `not found exception`.
+
+**Returns:** `book response`
+
+**Notes:**
+- Read only transaction.
+
+
+### 1.4. Get many books
+
+Returns a page of existing books by provided pagination and filters.
+
+**Receives:** Pageable `pagination` and `filtering`
+
+**Steps:**
+1. Build specification with provided filtering.
+2. Fetch books with pagination and specification.
+
+**Returns:** `paginated response` for `book response`
+
+**Notes:**
+- Read only transaction.
+
+
+### 1.5. Delete book
+
+Deletes an existing book by provided id.
+
+**Receives:** long `bookId`
+
+**Steps:**
+2. Delete book by id.
+
+**Returns:** nothing
+
+**Notes:**
+- Deletes the book directly without loading it into the peristence context. Requires transacton.
+- No need to check if the book exists (in case it gets deleted mid operation) because the operation deletes it anyways.
+
+
+## 2. User operations
+
+1. Register new user
+2. Change user password
+3. Delete user
+
+### 2.1. Register new user
+
+Creates a new user with the provided data and persists it to the database.
+
+**Receives:** `register request`
+
+**Steps:**
+1. Check if user with provided id already exists. Throws `duplicate exception`.
+3. Encode password.
+2. Create new user with provided data.
+
+**Returns:** nothing
+
+**Notes:**
+- Requires transaction to read only committed data from the database.
+
+
+### 2.2. Change user password
+
+Changes the password of the accessing user.
+
+**Receives:** `password change request`
+
+**Steps:**
+1. Fetches authenticated user. If not present (somehow), throws `not found exception`.
+2. Check if new password is different from old password. Throws `invalid password exception`.
+3. Encodes new password.
+4. Updates user password to new one.
+
+**Returns:** nothing
+
+**Notes:**
+- Requires serialized transaction to remove concurrency for password change.
+
+
+### 2.3. Delete user
+
+Deletes the accessing user.
+
+**Receives:** nothing
+
+**Steps:**
+1. Fetches authenticated user id.
+2. Deletes user by id.
+
+**Returns:** nothing
+
+**Notes:**
+- Deletes user directly without loading it into the persistence context. Requires transaction.
+- No need to check if the user exists (in case the user gets deleted mid operation) because the operation deletes it anyways.

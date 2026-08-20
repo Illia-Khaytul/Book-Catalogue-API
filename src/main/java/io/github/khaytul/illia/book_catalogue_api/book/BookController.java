@@ -165,7 +165,7 @@ public class BookController {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> dataIntegrityViolationHandler(DataIntegrityViolationException e){
         Throwable cause = e.getCause();
-        if(cause != null && cause instanceof ConstraintViolationException constraintViolation){
+        if(cause != null && cause instanceof ConstraintViolationException){
             log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
 
             return ResponseEntity

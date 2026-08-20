@@ -5,10 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -17,6 +15,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.DuplicateEntryException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.EntityNotFoundException;
+import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.InvalidPasswordException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.UserNotAuthenticatedException;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolationException;
@@ -45,6 +44,17 @@ public class GlobalExceptionHandler {
         
         return new ErrorResponse(
             HttpStatus.NOT_FOUND, 
+            e.getMessage()
+        );
+    }
+    
+    @ExceptionHandler(InvalidPasswordException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse invalidPasswordHandler(InvalidPasswordException e){
+        log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
+        
+        return new ErrorResponse(
+            HttpStatus.BAD_REQUEST, 
             e.getMessage()
         );
     }
@@ -109,17 +119,6 @@ public class GlobalExceptionHandler {
             "User is not authenticated"
         );
     }
-    
-    @ExceptionHandler(BadCredentialsException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponse badCredentialsHandler(BadCredentialsException e){
-        log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
-        
-        return new ErrorResponse(
-            HttpStatus.UNAUTHORIZED, 
-            "Bad credentials"
-        );
-    }
 
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -128,7 +127,7 @@ public class GlobalExceptionHandler {
         
         return new ErrorResponse(
             HttpStatus.NOT_FOUND, 
-            e.getMessage()
+            "Resource not found"
         );
     }
 

@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 public record BookFiltering(
     
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 50)
     String titleContains,
 
     @Size(min = 1, max = 50)

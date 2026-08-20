@@ -1,12 +1,13 @@
 package io.github.khaytul.illia.book_catalogue_api.user;
 
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.DuplicateEntryException;
+import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.EntityNotFoundException;
+import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.InvalidPasswordException;
 import io.github.khaytul.illia.book_catalogue_api.security.SecurityUtils;
 import io.github.khaytul.illia.book_catalogue_api.user.request.PasswordChangeRequest;
 import io.github.khaytul.illia.book_catalogue_api.user.request.UserRegisterRequest;
@@ -54,8 +55,13 @@ public class UserService {
         log.debug("Fetching authenticated user");
         String username = SecurityUtils.getAuthenticatedUserDetails().getUsername();
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new BadCredentialsException(String.format("User with username '%s' does not exist", username)));
+            .orElseThrow(() -> new EntityNotFoundException("User with username '%s' does not exist", username));
         
+        log.debug("Checking if new password is different from old password");
+        if(!passwordEncoder.matches(request.newPassword(), user.getPassword())){
+            throw new InvalidPasswordException("New password cannot be the same as old password");
+        }
+
         log.debug("Changind user password");
         user.setPassword(passwordEncoder.encode(request.newPassword()));
 
