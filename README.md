@@ -17,6 +17,8 @@ It also implements basic username-password security (http basic) and allows for 
 - Spring DotEnv
 - Lombok
 - PostgreSQL
+- Spring Boot Test
+- Mockito
 - Testcontainers
 
 ## 3. Prerequisites
@@ -99,7 +101,7 @@ Utilizes Testcontainers for test databases.
 To run the tests execute the command:
 
 ```bash
-mvn test "-Dspring-boot.run.profiles=test"
+mvn test
 ```
 
 ## 8. Project Structure
