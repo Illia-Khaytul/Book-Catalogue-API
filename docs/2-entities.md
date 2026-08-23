@@ -2,9 +2,12 @@
 
 Entity design.
 
+All unique constraints are prefixed with "unique_"
+
 ## 1. Book
 
 **Fields:**
+- Long `id`: identity
 - String `title`: required
 - String `description`: lob, optional
 - String `author`: required
@@ -19,6 +22,7 @@ Notes:
 ## 2. User
 
 **Fields:**
+- Long `id`: identity
 - String `username`: required, unique
 - String `password`: required
 

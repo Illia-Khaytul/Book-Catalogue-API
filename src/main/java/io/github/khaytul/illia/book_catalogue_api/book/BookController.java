@@ -3,8 +3,6 @@ package io.github.khaytul.illia.book_catalogue_api.book;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -12,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,7 +25,6 @@ import io.github.khaytul.illia.book_catalogue_api.book.request.BookCreateRequest
 import io.github.khaytul.illia.book_catalogue_api.book.request.BookUpdateRequest;
 import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponse;
 import io.github.khaytul.illia.book_catalogue_api.common.pagination.PaginatedResponse;
-import io.github.khaytul.illia.book_catalogue_api.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -43,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Books", description = "Endpoints for the standard crud operations on books.")
 @SecurityRequirement(name = "basicAuth")
 @Slf4j
+@Validated
 public class BookController {
 
     private final BookService bookService;
@@ -58,7 +55,7 @@ public class BookController {
         * Fails with '409 Conflict' if a book with the same title and author already exists.
         """)
     @ApiResponses({
-        @ApiResponse(responseCode = "201", ref = "#/components/responses/book_success_response"),
+        @ApiResponse(responseCode = "201", ref = "#/components/responses/book_created_response"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
         @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response"),
@@ -70,7 +67,7 @@ public class BookController {
         BookResponse response = bookService.createBook(request);
 
         return ResponseEntity
-            .created(new URI("/books/" + response.id()))
+            .created(new URI("/api/v1/books/" + response.id()))
             .body(response);
     }
     
@@ -126,7 +123,7 @@ public class BookController {
         * Fails with '400 Bad Request' if the provided filtering data is not valid.
         """)
     @ApiResponses({
-        @ApiResponse(responseCode = "200", ref = "#/components/responses/page_success_response"),
+        @ApiResponse(responseCode = "200", ref = "#/components/responses/book_page_response"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
@@ -156,32 +153,6 @@ public class BookController {
         @Valid @PathVariable @Positive long bookId
     ){
         bookService.deleteBook(bookId);
-    }
-
-    /*
-            Local exception handling
-    */
-   
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> dataIntegrityViolationHandler(DataIntegrityViolationException e){
-        Throwable cause = e.getCause();
-        if(cause != null && cause instanceof ConstraintViolationException){
-            log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
-
-            return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(new ErrorResponse(
-                    HttpStatus.CONFLICT,
-                    "A book with this title and author already exists"
-                ));
-        }
-        
-        return ResponseEntity
-            .internalServerError()
-            .body(new ErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR, 
-                "Something went wrong"
-            ));
     }
     
 }

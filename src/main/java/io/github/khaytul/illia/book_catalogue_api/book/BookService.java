@@ -31,7 +31,7 @@ public class BookService {
 
     @Transactional
     public BookResponse createBook(BookCreateRequest request) {
-        log.info("Createing new book with title '{}' by '{}'", request.title(), request.author());
+        log.info("Creating new book with title '{}' by '{}'", request.title(), request.author());
 
         log.debug("Checking if a book with this title and author already exists");
         if(bookRepository.existsByTitleAndAuthor(request.title(), request.author())){
@@ -44,7 +44,7 @@ public class BookService {
         log.debug("Persisting new book");
         book = bookRepository.save(book);
 
-        log.info("New book successfully createed with id {}", book.getId());
+        log.info("New book successfully created with id {}", book.getId());
 
         return new BookResponse(book);
     }
@@ -128,7 +128,7 @@ public class BookService {
             Helper methods
     */
 
-    public Book createBookFromRequest(BookCreateRequest request){
+    private Book createBookFromRequest(BookCreateRequest request){
         Book book = new Book();
         book.setTitle(request.title());
         book.setDescription(request.description());
@@ -139,7 +139,7 @@ public class BookService {
         return book;
     }
 
-    public void updateBookFromRequest(Book book, BookUpdateRequest request){
+    private void updateBookFromRequest(Book book, BookUpdateRequest request){
         book.setTitle(request.title() == null ? book.getTitle() : request.title());
         book.setDescription(request.description() == null ? book.getDescription() : request.description());
         book.setAuthor(request.author() == null ? book.getAuthor() : request.author());

@@ -1,12 +1,11 @@
 package io.github.khaytul.illia.book_catalogue_api.exception;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,7 +21,6 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
-@Order(Ordered.LOWEST_PRECEDENCE)
 @Slf4j
 public class GlobalExceptionHandler {
     
@@ -62,11 +60,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse methodArgumentNotValidHandler(MethodArgumentNotValidException e){
-        Map<String, String> errors = e.getBindingResult().getFieldErrors().stream()
-            .collect(Collectors.toMap(
-                error -> error.getField(), 
-                error -> error.getDefaultMessage()
-            ));
+        Map<String, String> errors = new HashMap<>();
+        e.getBindingResult().getFieldErrors().forEach(
+            error -> errors.putIfAbsent(error.getField(), error.getDefaultMessage())
+        );
 
         log.warn("Caught {}: {} - {}", e.getClass().getName(), e.getMessage(), errors);
         
@@ -80,17 +77,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse constraintViolationHandler(ConstraintViolationException e){
-        Map<String, String> errors = e.getConstraintViolations().stream()
-            .collect(Collectors.toMap(
-                error -> {
-                    String path = error.getPropertyPath().toString();
-                    return path.substring(path.lastIndexOf('.') + 1);
-                },
-                error -> error.getMessage()
-            ));
+        Map<String, String> errors = new HashMap<>();
+        e.getConstraintViolations().forEach(
+            error -> {
+                String path = error.getPropertyPath().toString();
+                errors.putIfAbsent(path.substring(path.lastIndexOf('.') + 1), error.getMessage());
+            }
+        );
 
         log.warn("Caught {}: {} - {}", e.getClass().getName(), e.getMessage(), errors);
-        
+
         return new ErrorResponse(
             HttpStatus.BAD_REQUEST, 
             "Invalid request parameters",
@@ -111,13 +107,37 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(UserNotAuthenticatedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponse userNotAuthenticatedHandler(AuthenticationCredentialsNotFoundException e){
+    public ErrorResponse userNotAuthenticatedHandler(UserNotAuthenticatedException e){
         log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
         
         return new ErrorResponse(
             HttpStatus.UNAUTHORIZED, 
             "User is not authenticated"
         );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> dataIntegrityViolationHandler(DataIntegrityViolationException e){
+        Throwable cause = e.getCause();
+        if(cause != null && cause instanceof org.hibernate.exception.ConstraintViolationException cve && cve.getConstraintName().startsWith("unique_")){
+            log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
+
+            return ResponseEntity
+                .status(HttpStatus.CONFLICT.value())
+                .body(new ErrorResponse(
+                    HttpStatus.CONFLICT, 
+                    "Unique constraint violation"
+                ));
+        }
+
+        log.error("[EXCEPTION] An unexpected exception has occurred", e);
+        
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR, 
+                "Something went wrong"
+            ));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

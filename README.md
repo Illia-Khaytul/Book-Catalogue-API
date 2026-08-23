@@ -13,8 +13,9 @@ It also implements basic username-password security (http basic) and allows for 
 - Spring Data JPA
 - Spring Web MVC
 - Spring Security
-- Spring OpenApi
+- SpringDoc
 - Spring DotEnv
+- Lombok
 - PostgreSQL
 - Testcontainers
 
@@ -42,14 +43,16 @@ Then configure the required environmental variables used in the application.
 This application uses the Spring DotEnv library to load the environment variable from a `.env` file located at the project root.
 
 ```text
-DEV_DATABASE_USERNAME=your_username
-DEV_DATABASE_PASSWORD=your_password
-DEV_DATABASE_URL=//your_ip:your_port/your_database
+DEV_DATABASE_USERNAME=db_username
+DEV_DATABASE_PASSWORD=db_password
+DEV_DATABASE_URL=//db_ip:db_port/db_name
 
-PROD_DATABASE_USERNAME=your_username
-PROD_DATABASE_PASSWORD=your_password
-PROD_DATABASE_URL=//your_ip:your_port/your_database
+PROD_DATABASE_USERNAME=db_username
+PROD_DATABASE_PASSWORD=db_password
+PROD_DATABASE_URL=//db_ip:db_port/db_name
 ```
+
+The `datasource.url` in the `application.properties` file already contains the `jdbc:postgresql:` prefix and expects just the address of the database itself.
 
 Select your desired profile (dev/prod) in the `application.properties` file.
 
@@ -71,13 +74,13 @@ Finally start the application.
 mvn spring-boot:run
 ```
 
-Now the application is available at `http://localhost:8080`
+Now the application is available at `http://localhost:8080/api/v1`
 
 ## 5. API Documentation
 
-The API documentation is automatically generated with Spring OpenApi.
+The API documentation is automatically generated with SpringDoc.
 
-It is available at `http://localhost:8080/swagger-ui/index.html` on the `dev` profile.
+It is available at `http://localhost:8080/api/v1/swagger-ui/index.html` on the `dev` profile.
 
 ## 6. Security
 
@@ -87,7 +90,19 @@ All endpoints for book operation as well as user password change and deletion re
 To access the endpoints it is required to create a new user with a unique username (see `create` operation in the api documentation).
 Then use your username and password to authenticate successfully.
 
-## 7. Project Structure
+## 7. Run Tests
+
+Features unit tests for service classes and components, slice tests for controllers and repositories, and integration tests for full application testing.
+
+Utilizes Testcontainers for test databases.
+
+To run the tests execute the command:
+
+```bash
+mvn test "-Dspring-boot.run.profiles=test"
+```
+
+## 8. Project Structure
 
 The project is structured by domain, where each folder contains the classes related by meaning.
 1. `book` contains all the classes responsible for operating with books.
@@ -96,3 +111,15 @@ The project is structured by domain, where each folder contains the classes rela
 4. `exception` contains the custom exceptions and handling.
 5. `common` contains small classes and utilities used in multiple places.
 6. `openapi` contains the openapi configuration.
+
+## 9. Design Documentation
+
+The design documentation is located at the [/docs](/docs/1-overview.md) folder.
+
+## 10. Known Limitations
+
+The current api allows anyone to create a user and start editing the books. Normally this would be a security risk, but in this case it was an intentional decision. This project was kept intentionally simple for learning purposes while still showcasing the implementation of different technologies such as spring security.
+
+Password validation is also intentionally weak. For the small scope of this application it was not necessary to add complex password validation (Passay) aside from the current bean validation present in the dtos.
+
+Future updates to this project may include book ownership, roles and advanced password validation to enhance security.

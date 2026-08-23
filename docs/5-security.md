@@ -18,3 +18,4 @@ Security configuration and component definition.
 - Custom `UserDetails` to hold the user username and id (for easier user access from the database).
 - Custom `UserDetailsService` to fetch the user from the database.
 - `DaoAuthenticationProvider` with the configured password encoder and user details service.
+- Custom `AuthenticationEntryPoint` for authentication exception handling (in [6-exceptions.md](/docs/6-exceptions.md))

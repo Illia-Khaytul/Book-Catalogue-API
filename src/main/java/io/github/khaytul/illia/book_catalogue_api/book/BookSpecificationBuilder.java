@@ -5,11 +5,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import io.github.khaytul.illia.book_catalogue_api.book.request.BookFiltering;
 
-@Service
+@Component
 public class BookSpecificationBuilder {
 
     public Specification<Book> fromFilter(BookFiltering filtering){

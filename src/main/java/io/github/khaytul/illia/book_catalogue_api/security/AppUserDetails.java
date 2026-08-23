@@ -12,13 +12,13 @@ import io.github.khaytul.illia.book_catalogue_api.user.User;
 import lombok.Setter;
 
 @Setter
-public class MyUserDetails implements UserDetails{
+public class AppUserDetails implements UserDetails{
 
     private Long userId;
     private String username;
     private String password;
 
-    public MyUserDetails(User user){
+    public AppUserDetails(User user){
         userId = user.getId();
         username = user.getUsername();
         password = user.getPassword();

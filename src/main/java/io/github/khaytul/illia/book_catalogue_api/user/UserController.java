@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.github.khaytul.illia.book_catalogue_api.user.request.PasswordChangeRequest;
 import io.github.khaytul.illia.book_catalogue_api.user.request.UserCreateRequest;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -40,14 +40,13 @@ public class UserController {
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Operation successful"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
-        @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
         @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
-    public void create(
-        @Valid @RequestBody UserCreateRequest request
+    public void createUser(
+        @Validated @RequestBody UserCreateRequest request
     ){
-        userService.create(request);
+        userService.createUser(request);
     }
 
     @PatchMapping(path = "/password")
@@ -60,10 +59,11 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "Operation successful"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
+        @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response"),
         @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
     })
     public void changePassword(
-        @Valid @RequestBody PasswordChangeRequest request
+        @Validated @RequestBody PasswordChangeRequest request
     ){
         userService.changePassword(request);
     }

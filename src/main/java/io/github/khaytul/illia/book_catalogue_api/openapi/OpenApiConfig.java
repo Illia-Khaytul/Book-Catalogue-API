@@ -19,10 +19,12 @@ import io.swagger.v3.core.converter.ResolvedSchema;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
@@ -47,14 +49,19 @@ public class OpenApiConfig {
             )
             .addResponses(
                 "book_success_response", 
-                buildApiResponse("BookResponse", "Operation successful", new BookResponse(1l, "Good Book Vol.1", "Lorem ipsum dolor sit amet", 
-                    "Original Author", 200, LocalDate.parse("2026-08-15T03:18:59Z")))
+                buildApiResponse("BookResponse", "Operation successful", new BookResponse((long) 1, "Good Book Vol.1", "Lorem ipsum dolor sit amet", 
+                    "Original Author", 200, LocalDate.parse("2026-08-15")))
             )
             .addResponses(
-                "page_success_response", 
-                buildApiResponse("PaginatedResponse", "Operation successful", new PaginatedResponse<>(5, 10, 2, 100, List.of(
-                    new BookResponse(1l, "Good Book Vol.1", "Lorem ipsum dolor sit amet", "Original Author", 200, LocalDate.parse("2020-08-15T03:18:59Z")), 
-                    new BookResponse(1l, "Good Book Vol.2", "Quisque at arcu quis nisi auctor", "Original Author", 205, LocalDate.parse("2022-08-15T03:18:59Z")))))
+                "book_created_response", 
+                buildApiResponse("BookResponse", "Operation successful", new BookResponse((long) 1, "Good Book Vol.1", "Lorem ipsum dolor sit amet", 
+                    "Original Author", 200, LocalDate.parse("2026-08-15"))).headers(Map.of("Location", new Header().schema(new StringSchema().example("/api/v1/books/1"))))
+            )
+            .addResponses(
+                "book_page_response", 
+                buildApiResponse("PaginatedResponse", "Operation successful", new PaginatedResponse<>(5, 10, 2, 50, List.of(
+                    new BookResponse((long) 1, "Good Book Vol.1", "Lorem ipsum dolor sit amet", "Original Author", 200, LocalDate.parse("2020-08-15")), 
+                    new BookResponse((long) 2, "Good Book Vol.2", "Quisque at arcu quis nisi auctor", "Original Author", 205, LocalDate.parse("2022-08-15")))))
             )
             .addResponses(
                 "400_response", 
@@ -90,7 +97,7 @@ public class OpenApiConfig {
             .title("Book Catalogue API")
             .version("v1")
             .summary("A simple api for managing books and basic user authentication")
-            .description("This api provides user registration, pasword change and deletion endpoints, " + 
+            .description("This api provides user registration, password change and deletion endpoints, " + 
                 "as well as standard crud operations for books. It uses basic user authentication to access the " + 
                 "endpoints and has exception handling with custom error responses");
     }

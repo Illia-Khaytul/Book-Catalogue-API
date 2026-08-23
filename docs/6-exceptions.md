@@ -54,6 +54,14 @@ Fields:
 
 `message` = Concurrent modification error
 
+**DataIntegrityViolationException handler** -> 409 Conflict / 500 Internal Server Error
+
+Catches DataIntegrityViolationException and extracts its cause. If the cause is a ConstraintViolationException for a unique constraint, returns a 409 response. If it's any other unexpected exception, returns 500 Internal Server Error.
+
+`message` = Unique constraint violated
+
+It is a necessary handler because even though service operations check for duplicates it is still possible for a concurrent operation to create a duplicate before the first one saves, thus violating the uniqueness constraint. Spring automatically wraps the ConstraintViolationException into a DataIntegrityViolationException, which impedes normal handling. It is better to notify the user about the uniqueness violation rather than returning a generic 500 Internal Server Error response, therefore this handler is required. It is a safe check because all unique constraints are prefixed with "unique_".
+
 **NoResourceFoundException handler** -> 404 Not Found
 
 `message` = Resource not found
@@ -63,19 +71,6 @@ Fields:
 Catches any other unexpected exception and logs the stack trace
 
 `message` = Something went wrong
-
-### 2.1. Special cases
-
-**DataIntegrityViolationException handler:**
-
-Local to the book controller.
-
-If `DataIntegrityViolationException` was caused by a database unique constraint violation -> 409 Conflict
-
-Otherwise -> 500 Internal Server Error
-
-If a database constraint is violated (uniqueness, type, etc.) Spring wraps the thrown exception into a generic DataIntegrityViolationException.
-Instead of dynamically trying to figure out which violation occured in a global exception handler it is better to add a local handler to the controller where the exception may be thrown.
 
 ## 3. Security exception handling
 

@@ -2,11 +2,9 @@ package io.github.khaytul.illia.book_catalogue_api.user;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.DuplicateEntryException;
-import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.EntityNotFoundException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.InvalidPasswordException;
 import io.github.khaytul.illia.book_catalogue_api.security.SecurityUtils;
 import io.github.khaytul.illia.book_catalogue_api.user.request.PasswordChangeRequest;
@@ -19,15 +17,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SecurityUtils securityUtils;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, SecurityUtils securityUtils){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.securityUtils = securityUtils;
     }
 
     @Transactional
-    public void create(UserCreateRequest request) {
-        log.info("Createing new user");
+    public void createUser(UserCreateRequest request) {
+        log.info("Creating new user");
 
         log.debug("Checking if username is not taken");
         if(userRepository.existsByUsername(request.username())){
@@ -45,7 +45,7 @@ public class UserService {
         log.debug("Persisting new user");
         user = userRepository.save(user);
 
-        log.info("New user successfully createed with id {}", user.getId());
+        log.info("New user successfully created with id {}", user.getId());
     }
 
     @Transactional
@@ -53,16 +53,19 @@ public class UserService {
         log.info("Changing current user's password");
 
         log.debug("Fetching authenticated user");
-        String username = SecurityUtils.getAuthenticatedUserDetails().getUsername();
-        User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new EntityNotFoundException("Authenticated user does not exist"));
+        User user = securityUtils.loadAuthenticatedUser();
         
         log.debug("Checking if new password is different from old password");
-        if(!passwordEncoder.matches(request.newPassword(), user.getPassword())){
+        if(request.newPassword().equals(request.oldPassword())){
             throw new InvalidPasswordException("New password cannot be the same as old password");
         }
 
-        log.debug("Changind user password");
+        log.debug("Checking if old passwords match");
+        if(!passwordEncoder.matches(request.oldPassword(), user.getPassword())){
+            throw new InvalidPasswordException("Provided old password doesn't match current password");
+        }
+
+        log.debug("Changing user password");
         user.setPassword(passwordEncoder.encode(request.newPassword()));
 
         log.debug("Persisting updated user");
@@ -76,7 +79,7 @@ public class UserService {
         log.info("Deleting current user");
 
         log.debug("Fetching authenticated user id");
-        Long userId = SecurityUtils.getAuthenticatedUserDetails().getUserId();
+        Long userId = securityUtils.getAuthenticatedUserDetails().getUserId();
         
         log.debug("Deleting user");
         userRepository.deleteUserDirectly(userId);

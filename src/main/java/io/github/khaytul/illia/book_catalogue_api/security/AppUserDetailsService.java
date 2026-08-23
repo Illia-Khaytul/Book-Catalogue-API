@@ -4,16 +4,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
 import io.github.khaytul.illia.book_catalogue_api.user.User;
 import io.github.khaytul.illia.book_catalogue_api.user.UserRepository;
 
 @Service
-public class MyUserDetailsService implements UserDetailsService{
+public class AppUserDetailsService implements UserDetailsService{
 
     private final UserRepository userRepository;
 
-    public MyUserDetailsService(UserRepository userRepository){
+    public AppUserDetailsService(UserRepository userRepository){
         this.userRepository = userRepository;
     }
 
@@ -22,7 +21,7 @@ public class MyUserDetailsService implements UserDetailsService{
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException(String.format("User with username '%s' does not exist", username)));
         
-        return new MyUserDetails(user);
+        return new AppUserDetails(user);
     }
     
 }

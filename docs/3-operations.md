@@ -1,6 +1,6 @@
 # Operations
 
-Operation definition and enter/return data design.
+Operation definition and received and returned data design.
 
 ## 1. Book operations
 
@@ -89,7 +89,7 @@ Deletes an existing book by provided id.
 **Returns:** nothing
 
 Notes:
-- Deletes the book directly without loading it into the peristence context. Requires transacton.
+- Deletes the book directly without loading it into the persistence context. Requires transaction.
 - No need to check if the book exists (in case it gets deleted mid operation) because the operation deletes it anyways.
 
 
@@ -106,9 +106,9 @@ Creates a new user with the provided data and persists it to the database.
 **Receives:** `create request`
 
 **Steps:**
-1. Check if user with provided id already exists. Throws `duplicate exception`.
-3. Encode password.
-2. Create new user with provided data.
+1. Check if user with provided username already exists. Throws `duplicate exception`.
+2. Encode password.
+3. Create new user with provided data.
 
 **Returns:** nothing
 
@@ -124,9 +124,10 @@ Changes the password of the accessing user.
 
 **Steps:**
 1. Fetches authenticated user. If not present (somehow), throws `not found exception`.
-2. Check if new password is different from old password. Throws `invalid password exception`.
-3. Encodes new password.
-4. Updates user password to new one.
+3. Check if new password is different from old password. Throws `invalid password exception`.
+2. Check if provided old password matches the current user password. Throws `invalid password exception`.
+4. Encodes new password.
+5. Updates user password to new one.
 
 **Returns:** nothing
 
