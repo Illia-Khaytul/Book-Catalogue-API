@@ -70,7 +70,7 @@ public class BookControllerTests {
                 null
             );
             BookResponse response = new BookResponse(
-                (long) 1,
+                1L,
                 "Cool Book Vol.1", 
                 null, 
                 "Not An Author", 
@@ -165,7 +165,7 @@ public class BookControllerTests {
                 null
             );
             BookResponse response = new BookResponse(
-                (long) 1,
+                1L,
                 "Cool Book Vol.1", 
                 "Lorem ipsum dolor sit amet", 
                 "Not An Author", 
@@ -253,7 +253,7 @@ public class BookControllerTests {
             //Arrange
             long bookId = 1;
             BookResponse response = new BookResponse(
-                (long) 1,
+                1L,
                 "Cool Book Vol.1", 
                 "Lorem ipsum dolor sit amet", 
                 "Not An Author", 
@@ -304,7 +304,7 @@ public class BookControllerTests {
         public void whenValidRequest_shouldReturn200() throws Exception{
             //Arrange
             BookResponse book = new BookResponse(
-                (long) 1,
+                1L,
                 "Cool Book Vol.1", 
                 "Lorem ipsum dolor sit amet", 
                 "Not An Author", 

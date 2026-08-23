@@ -49,19 +49,19 @@ public class OpenApiConfig {
             )
             .addResponses(
                 "book_success_response", 
-                buildApiResponse("BookResponse", "Operation successful", new BookResponse((long) 1, "Good Book Vol.1", "Lorem ipsum dolor sit amet", 
+                buildApiResponse("BookResponse", "Operation successful", new BookResponse(1L, "Good Book Vol.1", "Lorem ipsum dolor sit amet", 
                     "Original Author", 200, LocalDate.parse("2026-08-15")))
             )
             .addResponses(
                 "book_created_response", 
-                buildApiResponse("BookResponse", "Operation successful", new BookResponse((long) 1, "Good Book Vol.1", "Lorem ipsum dolor sit amet", 
+                buildApiResponse("BookResponse", "Operation successful", new BookResponse(1L, "Good Book Vol.1", "Lorem ipsum dolor sit amet", 
                     "Original Author", 200, LocalDate.parse("2026-08-15"))).headers(Map.of("Location", new Header().schema(new StringSchema().example("/api/v1/books/1"))))
             )
             .addResponses(
                 "book_page_response", 
                 buildApiResponse("PaginatedResponse", "Operation successful", new PaginatedResponse<>(5, 10, 2, 50, List.of(
-                    new BookResponse((long) 1, "Good Book Vol.1", "Lorem ipsum dolor sit amet", "Original Author", 200, LocalDate.parse("2020-08-15")), 
-                    new BookResponse((long) 2, "Good Book Vol.2", "Quisque at arcu quis nisi auctor", "Original Author", 205, LocalDate.parse("2022-08-15")))))
+                    new BookResponse(1L, "Good Book Vol.1", "Lorem ipsum dolor sit amet", "Original Author", 200, LocalDate.parse("2020-08-15")), 
+                    new BookResponse(2L, "Good Book Vol.2", "Quisque at arcu quis nisi auctor", "Original Author", 205, LocalDate.parse("2022-08-15")))))
             )
             .addResponses(
                 "400_response", 

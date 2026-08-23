@@ -196,7 +196,7 @@ public class GlobalExceptionHandlerTests {
 
         @Test
         @DisplayName("Should return 500 Internal Server Error when caught unexpected DataIntegrityViolationException")
-        public void whenCaughtOptimisticLockException_shouldReturn409() throws Exception{
+        public void whenUnexpectedDataIntegrityViolationException_shouldReturn500() throws Exception{
             //Arrange
             when(bookService.getBook(anyLong()))
                 .thenThrow(new DataIntegrityViolationException("message", new RuntimeException()));

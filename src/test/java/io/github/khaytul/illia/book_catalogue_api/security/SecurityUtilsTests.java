@@ -49,7 +49,7 @@ public class SecurityUtilsTests {
         @BeforeEach
         public void beforeEach(){
             securityUtilsSpy = spy(securityUtils);
-            userDetails = new AppUserDetails(new User((long) 1, "username", "password"));
+            userDetails = new AppUserDetails(new User(1L, "username", "password"));
         }
 
         @Test
@@ -74,7 +74,7 @@ public class SecurityUtilsTests {
         @DisplayName("Should return loaded user when authenticated user exists")
         public void whenAuthenticatedUserExists_shoudlReturnLoadedUser(){
             //Arrange
-            User user = new User((long) 1, "username", "password");
+            User user = new User(1L, "username", "password");
             
             doReturn(userDetails).when(securityUtilsSpy)
                 .getAuthenticatedUserDetails();
@@ -183,7 +183,7 @@ public class SecurityUtilsTests {
         @DisplayName("Should return AppUserDetails when user is authenticated")
         public void whenAuthenticationPresent_shouldReturnAppUserDetails(){
             //Arrange
-            AppUserDetails userDetails = new AppUserDetails(new User((long) 1, "username", "password"));
+            AppUserDetails userDetails = new AppUserDetails(new User(1L, "username", "password"));
 
             securityContextHolder.when(SecurityContextHolder::getContext)
                 .thenReturn(securityContext);

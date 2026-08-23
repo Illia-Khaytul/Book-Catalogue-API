@@ -1,4 +1,4 @@
-package io.github.khaytul.illia.book_catalogue_api;
+package io.github.khaytul.illia.book_catalogue_api.config;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -7,7 +7,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
-class TestcontainersConfiguration {
+public class TestcontainersConfig {
 
 	@Bean
 	@ServiceConnection

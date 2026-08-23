@@ -17,8 +17,9 @@ It also implements basic username-password security (http basic) and allows for 
 - Spring DotEnv
 - Lombok
 - PostgreSQL
-- Spring Boot Test
+- JUnit 5
 - Mockito
+- Spring Boot Test
 - Testcontainers
 
 ## 3. Prerequisites
@@ -26,6 +27,7 @@ It also implements basic username-password security (http basic) and allows for 
 - Java 21+
 - Maven 3.9.19 (or higher)
 - PostgreSQL database (e.g. pgAdmin 4)
+- Docker Engine (for testcontainers)
 
 ## 4. Getting Started
 
@@ -98,7 +100,7 @@ Features unit tests for service classes and components, slice tests for controll
 
 Utilizes Testcontainers for test databases.
 
-To run the tests execute the command:
+To run the tests first make sure the Docker Engine is running, then execute the command:
 
 ```bash
 mvn test

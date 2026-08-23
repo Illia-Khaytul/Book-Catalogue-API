@@ -60,7 +60,7 @@ public class AppUserDetailsServiceTests {
         @DisplayName("Should return UserDetails when username exists")
         public void whenUsernameExists_shouldReturnUserDetails(){
             //Arrange
-            User foundUser = new User((long) 1, "username", "password");
+            User foundUser = new User(1L, "username", "password");
 
             when(userRepository.findByUsername(username))
                 .thenReturn(Optional.of(foundUser));

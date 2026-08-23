@@ -26,7 +26,7 @@ Every endpoint has a base path `/api/v1` and may throw with an error response `5
 
 **Returns:**
 - Status: 201 Created
-- Header: Location: `/api/v1//books/{bookId}`
+- Header: Location: `/api/v1/books/{bookId}`
 - Body: `book response`
     - Long `id`
     - String `title`
@@ -37,7 +37,7 @@ Every endpoint has a base path `/api/v1` and may throw with an error response `5
 
 **Error Responses:**
 - 400 Bad Request: request validation failed
-- 401 Unauthorized: invalid authention
+- 401 Unauthorized: invalid authentication
 - 409 Conflict: `duplicate exception`
 
 
@@ -66,7 +66,7 @@ Every endpoint has a base path `/api/v1` and may throw with an error response `5
 
 **Error Responses:**
 - 400 Bad Request: request validation failed
-- 401 Unauthorized: invalid authention
+- 401 Unauthorized: invalid authentication
 - 404 Not Found: `not found exception`
 - 409 Conflict: `duplicate exception` or concurrent modification
 
@@ -90,7 +90,7 @@ Every endpoint has a base path `/api/v1` and may throw with an error response `5
 
 **Error Responses:**
 - 400 Bad Request: request validation failed
-- 401 Unauthorized: invalid authention
+- 401 Unauthorized: invalid authentication
 - 404 Not Found: `not found exception`
 
 
@@ -119,7 +119,7 @@ Every endpoint has a base path `/api/v1` and may throw with an error response `5
 
 **Error Responses:**
 - 400 Bad Request: request validation failed
-- 401 Unauthorized: invalid authention
+- 401 Unauthorized: invalid authentication
 
 
 ### Delete book
@@ -134,7 +134,7 @@ Every endpoint has a base path `/api/v1` and may throw with an error response `5
 
 **Error Responses:**
 - 400 Bad Request: request validation failed
-- 401 Unauthorized: invalid authention
+- 401 Unauthorized: invalid authentication
 - 404 Not Found: `not found exception`
 
 
@@ -175,7 +175,7 @@ Every endpoint has a base path `/api/v1` and may throw with an error response `5
 
 **Error Responses:**
 - 400 Bad Request: request validation failed or invalid password
-- 401 Unauthorized: invalid authention
+- 401 Unauthorized: invalid authentication
 - 404 Not Found: `not found exception` (user was authenticated but doesn't exist in database, rare)
 
 
@@ -189,4 +189,4 @@ Every endpoint has a base path `/api/v1` and may throw with an error response `5
 - Status: 204 No Content
 
 **Error Responses:**
-- 401 Unauthorized: invalid authention
+- 401 Unauthorized: invalid authentication

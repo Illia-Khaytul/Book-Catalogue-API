@@ -16,7 +16,7 @@ Focus on the main logic flow of each method.
 
 Slice tests for controllers and controller advice.
 
-Utilizes `@WebMvcTest` and MockMmv to mock the controller layer of the application. Disables security with `addFilter = false`.
+Utilizes `@WebMvcTest` and MockMvc to mock the controller layer of the application. Disables security with `addFilter = false`.
 
 Controller advice tests utilize the `BookController` to generate exceptions via stubbing/validation.
 

@@ -27,7 +27,7 @@ import io.github.khaytul.illia.book_catalogue_api.user.request.PasswordChangeReq
 import io.github.khaytul.illia.book_catalogue_api.user.request.UserCreateRequest;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("UserServide tests")
+@DisplayName("UserService tests")
 public class UserServiceTests {
 
     @Mock
@@ -107,7 +107,7 @@ public class UserServiceTests {
         @BeforeEach
         public void beforeEach(){
             request = new PasswordChangeRequest("password", "newPassword");
-            authUser = new User((long) 1, "username", "password");
+            authUser = new User(1L, "username", "password");
         }
 
         @Test
@@ -154,9 +154,11 @@ public class UserServiceTests {
         @DisplayName("Should change user password when new password is valid")
         public void whenNewPasswordIsValid_shouldChangeUserPasswordAndSave(){
             //Arrange
+            String authUserPassword = authUser.getPassword();
+
             when(securityUtils.loadAuthenticatedUser())
                 .thenReturn(authUser);
-            when(passwordEncoder.matches(request.oldPassword(), authUser.getPassword()))
+            when(passwordEncoder.matches(request.oldPassword(), authUserPassword))
                 .thenReturn(true);
             when(passwordEncoder.encode(request.newPassword()))
                 .thenReturn(request.newPassword());
@@ -176,7 +178,7 @@ public class UserServiceTests {
             assertThat(user.getPassword()).isEqualTo(request.newPassword());
 
             verify(securityUtils).loadAuthenticatedUser();
-            verify(passwordEncoder).matches(request.oldPassword(), request.oldPassword());
+            verify(passwordEncoder).matches(request.oldPassword(), authUserPassword);
             verify(passwordEncoder).encode(request.newPassword());
             verify(userRepository).save(authUser);
         }
@@ -191,7 +193,7 @@ public class UserServiceTests {
 
         @BeforeEach
         public void beforeEach(){
-            userDetails = new AppUserDetails(new User((long) 1, "username", "password"));
+            userDetails = new AppUserDetails(new User(1L, "username", "password"));
         }
 
         @Test

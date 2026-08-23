@@ -124,8 +124,8 @@ Changes the password of the accessing user.
 
 **Steps:**
 1. Fetches authenticated user. If not present (somehow), throws `not found exception`.
-3. Check if new password is different from old password. Throws `invalid password exception`.
-2. Check if provided old password matches the current user password. Throws `invalid password exception`.
+2. Check if new password is different from old password. Throws `invalid password exception`.
+3. Check if provided old password matches the current user password. Throws `invalid password exception`.
 4. Encodes new password.
 5. Updates user password to new one.
 

@@ -85,7 +85,7 @@ public class BookServiceTests {
         public void whenBookDoesNotExist_shouldSaveAndReturnResponse(){
             //Arrange
             Book savedBook = new Book(
-                (long) 1,
+                1L,
                 request.title(),
                 request.description(),
                 request.author(),
@@ -341,7 +341,7 @@ public class BookServiceTests {
         public void whenBookIsFound_shouldReturnResponse(){
             //Arrange
             Book foundBook = new Book(
-                (long) 1,
+                1L,
                 "Cool Book Vol.1", 
                 "Lorem ipsum dolor sit amet", 
                 "Not An Author", 
@@ -390,7 +390,7 @@ public class BookServiceTests {
             @SuppressWarnings("unchecked")
             Specification<Book> spec = mock(Specification.class);
             Book foundBook = new Book(
-                (long) 1,
+                1L,
                 "Cool Book Vol.1", 
                 "Lorem ipsum dolor sit amet", 
                 "Not An Author", 
