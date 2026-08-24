@@ -16,7 +16,7 @@ It also implements basic username-password security (http basic) and allows for 
 - SpringDoc
 - Spring DotEnv
 - Lombok
-- PostgreSQL
+- PostgreSQL 18
 - JUnit 5
 - Mockito
 - Spring Boot Test
@@ -100,7 +100,15 @@ Features unit tests for service classes and components, slice tests for controll
 
 Utilizes Testcontainers for test databases.
 
-To run the tests first make sure the Docker Engine is running, then execute the command:
+To run the tests first make sure the Docker Engine is running. Run the following command to test it:
+
+```bash
+docker ps
+```
+
+This command shows the list of containers and their status if Docker is running and and ERROR message if not.
+
+Then execute this command to run the tests:
 
 ```bash
 mvn test

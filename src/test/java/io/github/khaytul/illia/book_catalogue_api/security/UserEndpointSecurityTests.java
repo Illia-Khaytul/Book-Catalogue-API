@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -62,7 +61,7 @@ public class UserEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 201 Created when accessed with no authentication")
-        public void whenNoAuthentication_shouldReturn201() throws Exception{
+        public void shouldReturn201_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 post("/users")
@@ -75,7 +74,7 @@ public class UserEndpointSecurityTests {
         @Test
         @WithMockUser
         @DisplayName("Should return 201 Created when accessed with authentication")
-        public void whenWithAuthentication_shouldReturn201() throws Exception{
+        public void shouldReturn201_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 post("/users")
@@ -105,7 +104,7 @@ public class UserEndpointSecurityTests {
         
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void whenNoAuthentication_shouldReturn401() throws Exception{
+        public void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 patch("/users/password")
@@ -118,7 +117,7 @@ public class UserEndpointSecurityTests {
         @Test
         @WithMockUser
         @DisplayName("Should return 200 Ok when accessed with authentication")
-        public void whenWithAuthentication_shouldReturn200() throws Exception{
+        public void shouldReturn200_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 patch("/users/password")
@@ -142,7 +141,7 @@ public class UserEndpointSecurityTests {
         
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void whenNoAuthentication_shouldReturn401() throws Exception{
+        public void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 delete("/users")
@@ -153,7 +152,7 @@ public class UserEndpointSecurityTests {
         @Test
         @WithMockUser
         @DisplayName("Should return 204 No Content when accessed with authentication")
-        public void whenWithAuthentication_shouldReturn200() throws Exception{
+        public void shouldReturn204_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 delete("/users")

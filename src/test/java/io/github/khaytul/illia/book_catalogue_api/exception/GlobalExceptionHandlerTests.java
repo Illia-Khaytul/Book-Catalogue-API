@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.MultiValueMap;
@@ -27,11 +29,11 @@ import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.Duplicate
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.EntityNotFoundException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.InvalidPasswordException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.UserNotAuthenticatedException;
-import jakarta.persistence.OptimisticLockException;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebMvcTest(BookController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @DisplayName("GlobalExceptionHandler tests")
 public class GlobalExceptionHandlerTests {
 
@@ -43,7 +45,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 409 Conflict when caught DuplicateEntryException")
-    public void whenCaughtDuplicateEntryException_shouldReturn409() throws Exception{
+    public void shouldReturn409_whenCaughtDuplicateEntryException() throws Exception{
         //Arrange
         DuplicateEntryException exception = new DuplicateEntryException("message");
 
@@ -63,7 +65,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 404 Not Found when caught EntityNotFoundException")
-    public void whenCaughtEntityNotFoundException_shouldReturn404() throws Exception{
+    public void shouldReturn404_whenCaughtEntityNotFoundException() throws Exception{
         //Arrange
         EntityNotFoundException exception = new EntityNotFoundException("message");
 
@@ -83,7 +85,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 400 Bad Request when caught InvalidPasswordException")
-    public void whenCaughtInvalidPasswordException_shouldReturn400() throws Exception{
+    public void shouldReturn400_whenCaughtInvalidPasswordException() throws Exception{
         //Arrange
         InvalidPasswordException exception = new InvalidPasswordException("message");
 
@@ -103,7 +105,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 400 Bad Request when caught MethodArgumentNotValidException")
-    public void whenCaughtMethodArgumentNotValidException_shouldReturn400() throws Exception{
+    public void shouldReturn400_whenCaughtMethodArgumentNotValidException() throws Exception{
         //Act and Assert
         mockMvc.perform(
             get("/books")
@@ -122,7 +124,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 400 Bad Request when caught ConstraintViolationException")
-    public void whenCaughtConstraintViolationException_shouldReturn400() throws Exception{
+    public void shouldReturn400_whenCaughtConstraintViolationException() throws Exception{
         //Act and Assert
         mockMvc.perform(
             get("/books/{bookId}", -1)
@@ -135,11 +137,11 @@ public class GlobalExceptionHandlerTests {
     }
 
     @Test
-    @DisplayName("Should return 409 Conflict when caught OptimisticLockException")
-    public void whenCaughtOptimisticLockException_shouldReturn409() throws Exception{
+    @DisplayName("Should return 409 Conflict when caught OptimisticLockingFailureException")
+    public void shouldReturn409_whenCaughtOptimisticLockingFailureException() throws Exception{
         //Arrange
         when(bookService.getBook(anyLong()))
-            .thenThrow(new OptimisticLockException());
+            .thenThrow(new OptimisticLockingFailureException("message"));
 
         //Act and Assert
         mockMvc.perform(
@@ -154,7 +156,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 401 Unauthorized when caught UserNotAuthenticatedException")
-    public void whenCaughtUserNotAuthenticatedException_shouldReturn401() throws Exception{
+    public void shouldReturn401_whenCaughtUserNotAuthenticatedException() throws Exception{
         //Arrange
         when(bookService.getBook(anyLong()))
             .thenThrow(new UserNotAuthenticatedException("message"));
@@ -176,7 +178,7 @@ public class GlobalExceptionHandlerTests {
 
         @Test
         @DisplayName("Should return 409 Conflict when a unique constraint is violated")
-        public void whenUniqueConstraintViolation_shouldReturn409() throws Exception{
+        public void shouldReturn409_whenUniqueConstraintViolation() throws Exception{
             //Arrange
             ConstraintViolationException cve = new ConstraintViolationException("message", new SQLException(), "unique_constraint");
 
@@ -196,7 +198,7 @@ public class GlobalExceptionHandlerTests {
 
         @Test
         @DisplayName("Should return 500 Internal Server Error when caught unexpected DataIntegrityViolationException")
-        public void whenUnexpectedDataIntegrityViolationException_shouldReturn500() throws Exception{
+        public void shouldReturn500_whenUnexpectedDataIntegrityViolationException() throws Exception{
             //Arrange
             when(bookService.getBook(anyLong()))
                 .thenThrow(new DataIntegrityViolationException("message", new RuntimeException()));
@@ -216,7 +218,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 404 Not Found when caught NoResourceFoundException")
-    public void whenCaughtNoResourceFoundException_shouldReturn404() throws Exception{
+    public void shouldReturn404_whenCaughtNoResourceFoundException() throws Exception{
         //Act and Assert
         mockMvc.perform(
             get("/non-existing-mapping")
@@ -230,7 +232,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 500 Internal Server Error when caught unexpected Exception")
-    public void whenCaughtUnexpectedException_shouldReturn500() throws Exception{
+    public void shouldReturn500_whenCaughtUnexpectedException() throws Exception{
         //Arrange
         when(bookService.getBook(anyLong()))
             .thenThrow(new RuntimeException());

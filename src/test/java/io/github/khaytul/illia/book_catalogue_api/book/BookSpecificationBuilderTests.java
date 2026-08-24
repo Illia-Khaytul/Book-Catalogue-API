@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,19 +21,14 @@ public class BookSpecificationBuilderTests {
     @InjectMocks
     private BookSpecificationBuilder bookSpecificationBuilder;
     
-    private BookFiltering filtering;
-
-    @BeforeEach
-    public void beforeEach(){
-        filtering = new BookFiltering(
-            "title", 
-            "author", 
-            0, 
-            100, 
-            LocalDate.parse("2026-12-31"), 
-            LocalDate.parse("2000-01-01")
-        );
-    }
+    private final BookFiltering filtering = new BookFiltering(
+        "title", 
+        "author", 
+        0, 
+        100, 
+        LocalDate.parse("2026-12-31"), 
+        LocalDate.parse("2000-01-01")
+    );
 
     @Nested
     @DisplayName("fromFilter tests")
@@ -42,9 +36,9 @@ public class BookSpecificationBuilderTests {
 
         @Test
         @DisplayName("Should return empty specification when filtering is empty")
-        public void whenFilteringIsEmpty_shouldReturnEmptySpecification(){
+        public void shouldReturnEmptySpecification_whenFilteringIsEmpty(){
             //Arrange
-            filtering = new BookFiltering(null, null, null, null, null, null);
+            BookFiltering filtering = new BookFiltering(null, null, null, null, null, null);
 
             //Act
             Specification<Book> spec = bookSpecificationBuilder.fromFilter(filtering);
@@ -55,7 +49,7 @@ public class BookSpecificationBuilderTests {
 
         @Test
         @DisplayName("Should return specification when filtering is not empty")
-        public void whenFilteringIsNotEmpty_shouldReturnSpecification(){
+        public void shouldReturnSpecification_whenFilteringIsNotEmpty(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.fromFilter(filtering);
 
@@ -71,7 +65,7 @@ public class BookSpecificationBuilderTests {
 
         @Test
         @DisplayName("Should return null when titleContains is null")
-        public void whenTitleContainsIsNull_shouldReturnNull(){
+        public void shouldReturnNull_whenTitleContainsIsNull(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.titleContains(null);
 
@@ -81,7 +75,7 @@ public class BookSpecificationBuilderTests {
         
         @Test
         @DisplayName("Should return null when titleContains is empty")
-        public void whenTitleContainsIsEmpty_shouldReturnNull(){
+        public void shouldReturnNull_whenTitleContainsIsEmpty(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.titleContains("");
 
@@ -91,7 +85,7 @@ public class BookSpecificationBuilderTests {
         
         @Test
         @DisplayName("Should return specification when titleContains is not null nor empty")
-        public void whenTitleContainsIsValid_shouldReturnSpecification(){
+        public void shouldReturnSpecification_whenTitleContainsIsValid(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.titleContains(filtering.titleContains());
 
@@ -107,7 +101,7 @@ public class BookSpecificationBuilderTests {
 
         @Test
         @DisplayName("Should return null when authorName is null")
-        public void whenAuthorNameIsNull_shouldReturnNull(){
+        public void shouldReturnNull_whenAuthorNameIsNull(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.withAuthorName(null);
 
@@ -117,7 +111,7 @@ public class BookSpecificationBuilderTests {
         
         @Test
         @DisplayName("Should return null when authorName is empty")
-        public void whenAuthorNameIsEmpty_shouldReturnNull(){
+        public void shouldReturnNull_whenAuthorNameIsEmpty(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.withAuthorName("");
 
@@ -127,7 +121,7 @@ public class BookSpecificationBuilderTests {
         
         @Test
         @DisplayName("Should return specification when authorName is not null nor empty")
-        public void whenAuthorNameIsValid_shouldReturnSpecification(){
+        public void shouldReturnSpecification_whenAuthorNameIsValid(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.withAuthorName(filtering.authorName());
 
@@ -143,7 +137,7 @@ public class BookSpecificationBuilderTests {
 
         @Test
         @DisplayName("Should return null when minPages is null")
-        public void whenMinPagesIsNull_shouldReturnNull(){
+        public void shouldReturnNull_whenMinPagesIsNull(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.withMinPages(null);
 
@@ -153,7 +147,7 @@ public class BookSpecificationBuilderTests {
         
         @Test
         @DisplayName("Should return specification when minPages is not null")
-        public void whenMinPagesIsValid_shouldReturnSpecification(){
+        public void shouldReturnSpecification_whenMinPagesIsValid(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.withMinPages(filtering.minPages());
 
@@ -169,7 +163,7 @@ public class BookSpecificationBuilderTests {
 
         @Test
         @DisplayName("Should return null when maxPages is null")
-        public void whenMaxPagesIsNull_shouldReturnNull(){
+        public void shouldReturnNull_whenMaxPagesIsNull(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.withMaxPages(null);
 
@@ -179,7 +173,7 @@ public class BookSpecificationBuilderTests {
         
         @Test
         @DisplayName("Should return specification when maxPages is not null")
-        public void whenMaxPagesIsValid_shouldReturnSpecification(){
+        public void shouldReturnSpecification_whenMaxPagesIsValid(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.withMaxPages(filtering.maxPages());
 
@@ -195,7 +189,7 @@ public class BookSpecificationBuilderTests {
 
         @Test
         @DisplayName("Should return null when releasedAfter is null")
-        public void whenReleasedAftersIsNull_shouldReturnNull(){
+        public void shouldReturnNull_whenReleasedAftersIsNull(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.releasedAfter(null);
 
@@ -205,7 +199,7 @@ public class BookSpecificationBuilderTests {
         
         @Test
         @DisplayName("Should return specification when releasedAfter is not null")
-        public void whenReleasedAfterIsValid_shouldReturnSpecification(){
+        public void shouldReturnSpecification_whenReleasedAfterIsValid(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.releasedAfter(filtering.releasedAfter());
 
@@ -221,7 +215,7 @@ public class BookSpecificationBuilderTests {
 
         @Test
         @DisplayName("Should return null when releasedBefore is null")
-        public void whenReleasedBeforeIsNull_shouldReturnNull(){
+        public void shouldReturnNull_whenReleasedBeforeIsNull(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.releasedBefore(null);
 
@@ -231,7 +225,7 @@ public class BookSpecificationBuilderTests {
         
         @Test
         @DisplayName("Should return specification when maxPages is not null")
-        public void whenReleasedBeforeIsValid_shouldReturnSpecification(){
+        public void shouldReturnSpecification_whenReleasedBeforeIsValid(){
             //Act
             Specification<Book> spec = bookSpecificationBuilder.releasedBefore(filtering.releasedBefore());
 

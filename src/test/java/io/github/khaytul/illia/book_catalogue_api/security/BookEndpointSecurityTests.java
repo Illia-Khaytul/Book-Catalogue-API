@@ -50,19 +50,13 @@ public class BookEndpointSecurityTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private final BookResponse response = new BookResponse(null, null, null, null, null, null);
+
     @Nested
     @DisplayName("createBook security tests")
     class CreateBookSecurityTests{
 
         private final BookCreateRequest request = new BookCreateRequest(
-            "Cool Book Vol.1", 
-            null, 
-            "Not An Author", 
-            null, 
-            null
-        );
-        private final BookResponse response = new BookResponse(
-            1L,
             "Cool Book Vol.1", 
             null, 
             "Not An Author", 
@@ -79,7 +73,7 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void whenNoAuthentication_shouldReturn401() throws Exception{
+        public void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 post("/books")
@@ -92,7 +86,7 @@ public class BookEndpointSecurityTests {
         @Test
         @WithMockUser
         @DisplayName("Should return 201 Created when accessed with authentication")
-        public void whenWithAuthentication_shouldReturn201() throws Exception{
+        public void shouldReturn201_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 post("/books")
@@ -115,7 +109,6 @@ public class BookEndpointSecurityTests {
             null, 
             null
         );            
-        private final BookResponse response = new BookResponse(null, null, null, null, null, null);
 
         @BeforeEach
         public void beforeEach(){
@@ -126,7 +119,7 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void whenNoAuthentication_shouldReturn401() throws Exception{
+        public void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 patch("/books/1")
@@ -139,7 +132,7 @@ public class BookEndpointSecurityTests {
         @Test
         @WithMockUser
         @DisplayName("Should return 200 Ok when accessed with authentication")
-        public void whenWithAuthentication_shouldReturn201() throws Exception{
+        public void shouldReturn200_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 patch("/books/1")
@@ -155,8 +148,6 @@ public class BookEndpointSecurityTests {
     @DisplayName("getBook security tests")
     class GetBookSecurityTests{
 
-        private final BookResponse response = new BookResponse(null, null, null, null, null, null);
-
         @BeforeEach
         public void beforeEach(){
             //Arrange
@@ -166,7 +157,7 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void whenNoAuthentication_shouldReturn401() throws Exception{
+        public void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books/1")
@@ -177,7 +168,7 @@ public class BookEndpointSecurityTests {
         @Test
         @WithMockUser
         @DisplayName("Should return 200 Ok when accessed with authentication")
-        public void whenWithAuthentication_shouldReturn201() throws Exception{
+        public void shouldReturn200_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books/1")
@@ -202,7 +193,7 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void whenNoAuthentication_shouldReturn401() throws Exception{
+        public void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books")
@@ -213,7 +204,7 @@ public class BookEndpointSecurityTests {
         @Test
         @WithMockUser
         @DisplayName("Should return 200 Ok when accessed with authentication")
-        public void whenWithAuthentication_shouldReturn201() throws Exception{
+        public void shouldReturn200_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books")
@@ -236,7 +227,7 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void whenNoAuthentication_shouldReturn401() throws Exception{
+        public void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 delete("/books/1")
@@ -247,7 +238,7 @@ public class BookEndpointSecurityTests {
         @Test
         @WithMockUser
         @DisplayName("Should return 204 No Content when accessed with authentication")
-        public void whenWithAuthentication_shouldReturn201() throws Exception{
+        public void shouldReturn204_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 delete("/books/1")

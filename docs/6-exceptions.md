@@ -15,7 +15,7 @@ Exceptions thrown by the application.
 **Normal:**
 - `MethodArgumentNotValidException`: when `@Validated` validation fails
 - `ConstraintViolationException`: when `@Valid` validation fails
-- `OptimisticLockException`: when concurrent entity modification is detected
+- `OptimisticLockingFailureException`: when concurrent entity modification is detected
 - `NoResourceFoundException`: when no exposed endpoint matches the request
 
 ## 2. Application exception handling
@@ -50,7 +50,7 @@ Fields:
 
 `data` = validation errors
 
-**OptimisticLockException handler** -> 409 Conflict
+**OptimisticLockingFailureException handler** -> 409 Conflict
 
 `message` = Concurrent modification error
 

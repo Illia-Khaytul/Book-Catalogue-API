@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,7 +17,6 @@ import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.Duplicate
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.EntityNotFoundException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.InvalidPasswordException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.UserNotAuthenticatedException;
-import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,9 +94,9 @@ public class GlobalExceptionHandler {
         );
     }
     
-    @ExceptionHandler(OptimisticLockException.class)
+    @ExceptionHandler(OptimisticLockingFailureException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse optimisticLockHandler(OptimisticLockException e){
+    public ErrorResponse optimisticLockHandler(OptimisticLockingFailureException e){
         log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
         
         return new ErrorResponse(

@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,6 +29,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(UserController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @DisplayName("UserController tests")
 public class UserControllerTests {
 
@@ -119,7 +121,7 @@ public class UserControllerTests {
         
         @Test
         @DisplayName("Should return 200 OK when request is valid")
-        public void whenValidRequest_shouldReturn200() throws Exception{
+        public void shouldReturn200_whenValidRequest() throws Exception{
             //Arrange
             PasswordChangeRequest request = new PasswordChangeRequest(
                 "oldPassword", 
@@ -143,7 +145,7 @@ public class UserControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when required request fields are missing")
-        public void whenRequestRequiredFieldsMissing_shouldReturn400() throws Exception{
+        public void shouldReturn400_whenRequestRequiredFieldsMissing() throws Exception{
             //Arrange
             PasswordChangeRequest request = new PasswordChangeRequest(null, null);
             
@@ -165,7 +167,7 @@ public class UserControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when request fields are invalid")
-        public void whenRequestInvalid_shouldReturn400() throws Exception{
+        public void shouldReturn400_whenRequestInvalid() throws Exception{
             //Arrange
             PasswordChangeRequest request = new PasswordChangeRequest("old", "new");
             

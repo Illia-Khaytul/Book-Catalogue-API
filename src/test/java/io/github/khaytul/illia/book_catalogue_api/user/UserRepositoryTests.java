@@ -32,7 +32,7 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
 
         @Test
         @DisplayName("Should return true when user exists by username")
-        public void whenExists_shouldReturnTrue(){
+        public void shouldReturnTrue_whenUserExists(){
             //Arrange
             User user = new User();
             user.setUsername("username");
@@ -48,7 +48,7 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
 
         @Test
         @DisplayName("Should return false when user does not exist by username")
-        public void whenNotExists_shouldReturnFalse(){
+        public void shouldReturnFalse_whenUserDoesNotExist(){
             //Act
             boolean exists = userRepository.existsByUsername("not exists");
 
@@ -64,7 +64,7 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
         
         @Test
         @DisplayName("Should return user optional when user exists by username")
-        public void whenExists_shouldReturnUser(){
+        public void shouldReturnUser_whenUserExists(){
             //Arrange
             User user = new User();
             user.setUsername("username");
@@ -81,7 +81,7 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
 
         @Test
         @DisplayName("Should return empty optional when user does not exist by username")
-        public void whenNotExists_shouldReturnEmpty(){
+        public void shouldReturnEmpty_whenUserDoesNotExist(){
             //Act
             Optional<User> optional = userRepository.findByUsername("not exists");
 

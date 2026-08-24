@@ -43,16 +43,11 @@ public class UserServiceTests {
     @DisplayName("createUser tests")
     class CreateUserTests{
 
-        private UserCreateRequest request;
-
-        @BeforeEach
-        public void beforeEach(){
-            request = new UserCreateRequest("username", "password");
-        }
+        private final UserCreateRequest request = new UserCreateRequest("username", "password");
 
         @Test
         @DisplayName("Should throw DuplicateEntryException when username is taken")
-        public void whenUsernameAlreadyExists_shouldThrowDuplicateEntryException() {
+        public void shouldThrowDuplicateEntryException_whenUsernameAlreadyExists() {
             //Arrange
             when(userRepository.existsByUsername(request.username()))
                 .thenReturn(true);
@@ -69,7 +64,7 @@ public class UserServiceTests {
 
         @Test
         @DisplayName("Should create and save user when username is not taken")
-        public void whenUserDoesNotExist_shouldEncodePasswordAndSave(){
+        public void shouldEncodePasswordAndSave_whenUserDoesNotExist(){
             //Arrange
             when(userRepository.existsByUsername(request.username()))
                 .thenReturn(false);
@@ -101,20 +96,19 @@ public class UserServiceTests {
     @DisplayName("changePassword tests")
     class ChangePasswordTests{
 
-        private PasswordChangeRequest request;
+        private final PasswordChangeRequest request = new PasswordChangeRequest("password", "newPassword");
         private User authUser;
 
         @BeforeEach
         public void beforeEach(){
-            request = new PasswordChangeRequest("password", "newPassword");
             authUser = new User(1L, "username", "password");
         }
 
         @Test
         @DisplayName("Should throw InvalidPasswordException when new password is the same as old password")
-        public void whenNewPasswordMatchesOldPassword_shouldThrowInvalidPasswordException(){
+        public void shouldThrowInvalidPasswordException_whenNewPasswordMatchesOldPassword(){
             //Arrange
-            request = new PasswordChangeRequest(request.oldPassword(), request.oldPassword());
+            PasswordChangeRequest request = new PasswordChangeRequest(this.request.oldPassword(), this.request.oldPassword());
 
             when(securityUtils.loadAuthenticatedUser())
                 .thenReturn(authUser);
@@ -132,7 +126,7 @@ public class UserServiceTests {
 
         @Test
         @DisplayName("Should throw InvalidPasswordException when old password does not match current password")
-        public void whenCurrentAndOldPasswordDoNotMatch_shouldThrowInvalidPasswordException(){
+        public void shouldThrowInvalidPasswordException_whenCurrentAndOldPasswordDoNotMatch(){
             //Arrange
             when(securityUtils.loadAuthenticatedUser())
                 .thenReturn(authUser);
@@ -152,7 +146,7 @@ public class UserServiceTests {
 
         @Test
         @DisplayName("Should change user password when new password is valid")
-        public void whenNewPasswordIsValid_shouldChangeUserPasswordAndSave(){
+        public void shouldChangeUserPasswordAndSave_whenNewPasswordIsValid(){
             //Arrange
             String authUserPassword = authUser.getPassword();
 
@@ -189,12 +183,7 @@ public class UserServiceTests {
     @DisplayName("deleteUser tests")
     class DeleteUserTests{
 
-        private AppUserDetails userDetails;
-
-        @BeforeEach
-        public void beforeEach(){
-            userDetails = new AppUserDetails(new User(1L, "username", "password"));
-        }
+        private final AppUserDetails userDetails = new AppUserDetails(new User(1L, "username", "password"));
 
         @Test
         @DisplayName("Should fetch authenticated user id and delete user")

@@ -29,6 +29,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.MultiValueMap;
@@ -43,6 +44,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(BookController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 @DisplayName("BookController tests")
 public class BookControllerTests {
 
@@ -60,7 +62,7 @@ public class BookControllerTests {
 
         @Test
         @DisplayName("Should return 201 Created when request is valid")
-        public void whenValidRequest_shouldReturn201() throws Exception{
+        public void shouldReturn201_whenValidRequest() throws Exception{
             //Arrange
             BookCreateRequest request = new BookCreateRequest(
                 "Cool Book Vol.1", 
@@ -96,7 +98,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when required request fields are missing")
-        public void whenRequestRequiredFieldsMissing_shouldReturn400() throws Exception{
+        public void shouldReturn400_whenRequestRequiredFieldsMissing() throws Exception{
             //Arrange
             BookCreateRequest request = new BookCreateRequest(null, null, null, null, null);
             
@@ -118,7 +120,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when request fields are invalid")
-        public void whenRequestInvalid_shouldReturn400() throws Exception{
+        public void shouldReturn400_whenRequestInvalid() throws Exception{
             //Arrange
             BookCreateRequest request = new BookCreateRequest(
                 "", 
@@ -154,7 +156,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 200 Ok when request is valid")
-        public void whenValidRequest_shouldReturn200() throws Exception{
+        public void shouldReturn200_whenValidRequest() throws Exception{
             //Arrange
             long bookId = 1;
             BookUpdateRequest request = new BookUpdateRequest(
@@ -190,7 +192,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when path variable is invalid")
-        public void whenPathVariableInvalid_shouldReturn400() throws Exception{
+        public void shouldReturn400_whenPathVariableInvalid() throws Exception{
             //Arrange
             long bookId = -1;
             BookUpdateRequest request = new BookUpdateRequest(null, null, null, null, null);
@@ -212,7 +214,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when request fields are invalid")
-        public void whenRequestInvalid_shouldReturn400() throws Exception{
+        public void shouldReturn400_whenRequestInvalid() throws Exception{
             //Arrange
             long bookId = 1;
             BookUpdateRequest request = new BookUpdateRequest(
@@ -249,7 +251,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 200 Ok when request is valid")
-        public void whenValidRequest_shouldReturn200() throws Exception{
+        public void shouldReturn200_whenValidRequest() throws Exception{
             //Arrange
             long bookId = 1;
             BookResponse response = new BookResponse(
@@ -276,7 +278,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when path variable is invalid")
-        public void whenPathVariableInvalid_shouldReturn400() throws Exception{
+        public void shouldReturn400_whenPathVariableInvalid() throws Exception{
             //Arrange
             long bookId = -1;
 
@@ -301,7 +303,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 200 Ok when request is valid")
-        public void whenValidRequest_shouldReturn200() throws Exception{
+        public void shouldReturn200_whenValidRequest() throws Exception{
             //Arrange
             BookResponse book = new BookResponse(
                 1L,
@@ -331,7 +333,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when query parameters are invalid")
-        public void whenQueryParametersInvalid_shouldReturn400() throws Exception{
+        public void shouldReturn400_whenQueryParametersInvalid() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books")
@@ -363,7 +365,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 204 No Content when request is valid")
-        public void whenValidRequest_shouldReturn204() throws Exception{
+        public void shouldReturn204_whenValidRequest() throws Exception{
             //Arrange
             long bookId = 1;
 
@@ -382,7 +384,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when path variable is invalid")
-        public void whenPathVariableInvalid_shouldReturn400() throws Exception{
+        public void shouldReturn400_whenPathVariableInvalid() throws Exception{
             //Arrange
             long bookId = -1;
 

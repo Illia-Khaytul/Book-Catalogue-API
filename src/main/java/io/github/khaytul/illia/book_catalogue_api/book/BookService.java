@@ -1,5 +1,6 @@
 package io.github.khaytul.illia.book_catalogue_api.book;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,7 +15,6 @@ import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponse;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.DuplicateEntryException;
 import io.github.khaytul.illia.book_catalogue_api.exception.exceptions.EntityNotFoundException;
 import io.github.khaytul.illia.book_catalogue_api.common.pagination.PaginatedResponse;
-import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -49,7 +49,7 @@ public class BookService {
         return new BookResponse(book);
     }
 
-    @Retryable(includes = OptimisticLockException.class, maxRetries = 3)
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetriesString = "${spring.app.retries.update-book}")
     @Transactional
     public BookResponse updateBook(long bookId, BookUpdateRequest request) {
         log.info("Updating book with id {}", bookId);
