@@ -27,7 +27,7 @@ import io.github.khaytul.illia.book_catalogue_api.config.SliceTestcontainersConf
 @Import({BookService.class, BookSpecificationBuilder.class})
 @ActiveProfiles("test")
 @DisplayName("Book specifications integration tests")
-public class BookSpecificationsIT extends SliceTestcontainersConfig{
+public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
 
     @Autowired
     private BookService bookService;

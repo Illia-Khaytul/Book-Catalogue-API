@@ -41,7 +41,7 @@ Focus on the correct operation of custom and derived repository methods.
 
 ## 3. Integration tests
 
-Integration tests for retriable `updateBook` and book specifications execution for `getBooks` (cannot be properly verified with unit tests), as well as end to end tests for the full api.
+Integration tests for retriable `updateBook` and BookSpecificationsBuilder for `getBooks` (cannot be properly verified with unit tests), as well as end to end tests for the full api.
 
 **Retriable book update IT**
 
@@ -49,7 +49,7 @@ Loads the full application with no web layer (`webEnvironment = NONE`) to allow 
 
 Focus on the correct retry operation of the method and not on the correct transactional rollback, load new entity, try again behavior since it is not possible to accurately simulate the necessary concurrent modification conditions to trigger the retry requirements.
 
-**Book Specification execution IT**
+**BookSpecificationBuilder IT**
 
 Loads only the database layer of the application and the required services `BookService`and `BookSpecificationBuilder`. For that reason it requires the abstract testcontainer parent configuration.
 

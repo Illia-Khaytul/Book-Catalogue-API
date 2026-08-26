@@ -11,7 +11,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,8 +43,13 @@ public class SecurityUtilsTests {
     @DisplayName("loadAuthenticatedUser tests")
     class LoadAuthenticatedUserTests{
 
-        private final SecurityUtils securityUtilsSpy = spy(securityUtils);
+        private SecurityUtils securityUtilsSpy;
         private final AppUserDetails userDetails = new AppUserDetails(new User(1L, "username", "password"));
+
+        @BeforeEach
+        public void beforeEach(){
+            securityUtilsSpy = spy(securityUtils);
+        }
 
         @Test
         @DisplayName("Should throw EntityNotFoundException when authenticated user does not exist")
@@ -93,12 +99,17 @@ public class SecurityUtilsTests {
     @DisplayName("getAuthenticatedUserDetails tests")
     class GetAuthenticatedUserDetailsTests{
 
-        private static final MockedStatic<SecurityContextHolder> securityContextHolder = mockStatic(SecurityContextHolder.class);
+        private MockedStatic<SecurityContextHolder> securityContextHolder;
         private final SecurityContext securityContext = mock(SecurityContext.class);
         private final Authentication authentication = mock(Authentication.class);
 
-        @AfterAll
-        public static void afterAll(){
+        @BeforeEach
+        public void beforeEach(){
+            securityContextHolder = mockStatic(SecurityContextHolder.class);
+        }
+
+        @AfterEach
+        public void afterEach(){
             securityContextHolder.close();
         }
 
@@ -106,8 +117,6 @@ public class SecurityUtilsTests {
         @DisplayName("Should throw UserNotAuthenticatedException when authentication is null")
         public void shouldThrowUserNotAuthenticatedException_whenAuthenticationIsNull(){
             //Arrange
-            securityContextHolder.when(SecurityContextHolder::getContext)
-                .thenReturn(securityContext);
             when(securityContext.getAuthentication())
                 .thenReturn(null);
 
