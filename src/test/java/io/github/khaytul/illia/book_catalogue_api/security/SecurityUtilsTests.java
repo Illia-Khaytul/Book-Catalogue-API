@@ -47,13 +47,13 @@ public class SecurityUtilsTests {
         private final AppUserDetails userDetails = new AppUserDetails(new User(1L, "username", "password"));
 
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             securityUtilsSpy = spy(securityUtils);
         }
 
         @Test
         @DisplayName("Should throw EntityNotFoundException when authenticated user does not exist")
-        public void shoudlThrowEntityNotFoundException_whenAuthenticatedUserDoesNotExist(){
+        void shoudlThrowEntityNotFoundException_whenAuthenticatedUserDoesNotExist(){
             //Arrange
             doReturn(userDetails).when(securityUtilsSpy)
                 .getAuthenticatedUserDetails();
@@ -71,7 +71,7 @@ public class SecurityUtilsTests {
         
         @Test
         @DisplayName("Should return loaded user when authenticated user exists")
-        public void shoudlReturnLoadedUser_whenAuthenticatedUserExists(){
+        void shoudlReturnLoadedUser_whenAuthenticatedUserExists(){
             //Arrange
             User user = new User(1L, "username", "password");
             
@@ -104,19 +104,21 @@ public class SecurityUtilsTests {
         private final Authentication authentication = mock(Authentication.class);
 
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             securityContextHolder = mockStatic(SecurityContextHolder.class);
         }
 
         @AfterEach
-        public void afterEach(){
+        void afterEach(){
             securityContextHolder.close();
         }
 
         @Test
         @DisplayName("Should throw UserNotAuthenticatedException when authentication is null")
-        public void shouldThrowUserNotAuthenticatedException_whenAuthenticationIsNull(){
+        void shouldThrowUserNotAuthenticatedException_whenAuthenticationIsNull(){
             //Arrange
+            securityContextHolder.when(SecurityContextHolder::getContext)
+                .thenReturn(securityContext);
             when(securityContext.getAuthentication())
                 .thenReturn(null);
 
@@ -131,7 +133,7 @@ public class SecurityUtilsTests {
 
         @Test
         @DisplayName("Should throw UserNotAuthenticatedException when authentication token is not authenticated")
-        public void shouldThrowUserNotAuthenticatedException_whenAuthenticationIsNotAuthenticated(){
+        void shouldThrowUserNotAuthenticatedException_whenAuthenticationIsNotAuthenticated(){
             //Arrange
             securityContextHolder.when(SecurityContextHolder::getContext)
                 .thenReturn(securityContext);
@@ -152,7 +154,7 @@ public class SecurityUtilsTests {
 
         @Test
         @DisplayName("Should throw UserNotAuthenticatedException when UserDetails is not instance of AppUserDetails")
-        public void shouldThrowUserNotAuthenticatedException_whenUserDetailsNotAppUserDetails(){
+        void shouldThrowUserNotAuthenticatedException_whenUserDetailsNotAppUserDetails(){
             //Arrange
             securityContextHolder.when(SecurityContextHolder::getContext)
                 .thenReturn(securityContext);
@@ -176,7 +178,7 @@ public class SecurityUtilsTests {
 
         @Test
         @DisplayName("Should return AppUserDetails when user is authenticated")
-        public void shouldReturnAppUserDetails_whenAuthenticationPresent(){
+        void shouldReturnAppUserDetails_whenAuthenticationPresent(){
             //Arrange
             AppUserDetails userDetails = new AppUserDetails(new User(1L, "username", "password"));
 

@@ -16,7 +16,7 @@ import io.github.khaytul.illia.book_catalogue_api.config.SliceTestcontainersConf
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-@DisplayName("BookRespository tests")
+@DisplayName("BookRepository tests")
 public class BookRepositoryTests extends SliceTestcontainersConfig{
 
     @Autowired
@@ -30,7 +30,7 @@ public class BookRepositoryTests extends SliceTestcontainersConfig{
 
         @Test
         @DisplayName("Should return true when book exists by title and author")
-        public void shouldReturnTrue_whenExists(){
+        void shouldReturnTrue_whenExists(){
             //Arrange
             Book book = new Book();
             book.setTitle("Cool Book");
@@ -46,7 +46,7 @@ public class BookRepositoryTests extends SliceTestcontainersConfig{
         
         @Test
         @DisplayName("Should return false when book's author exists but the title not")
-        public void shouldReturnFalse_whenAuthorExistsButTitleNot(){
+        void shouldReturnFalse_whenAuthorExistsButTitleNot(){
             //Arrange
             Book book = new Book();
             book.setTitle("Cool Book");
@@ -62,7 +62,7 @@ public class BookRepositoryTests extends SliceTestcontainersConfig{
         
         @Test
         @DisplayName("Should return false when book does not exist by title and author")
-        public void shouldReturnFalse_whenNotExists(){
+        void shouldReturnFalse_whenNotExists(){
             //Act
             boolean exists = bookRepository.existsByTitleAndAuthor("not exists", "not exists");
 
@@ -78,7 +78,7 @@ public class BookRepositoryTests extends SliceTestcontainersConfig{
         
         @Test
         @DisplayName("Should delete book by id")
-        public void shouldDeleteBookById(){
+        void shouldDeleteBookById(){
             //Arrange
             Book book = new Book();
             book.setTitle("Cool Book");

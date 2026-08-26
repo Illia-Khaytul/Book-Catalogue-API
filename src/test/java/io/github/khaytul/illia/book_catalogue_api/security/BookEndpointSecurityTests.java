@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,7 @@ import io.github.khaytul.illia.book_catalogue_api.book.request.BookFiltering;
 import io.github.khaytul.illia.book_catalogue_api.book.response.BookResponse;
 import io.github.khaytul.illia.book_catalogue_api.common.pagination.PaginatedResponse;
 import io.github.khaytul.illia.book_catalogue_api.security.exception.AuthenticationErrorHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(BookController.class)
@@ -65,7 +67,7 @@ public class BookEndpointSecurityTests {
         );
 
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             //Arrange
             when(bookService.createBook(any(BookCreateRequest.class)))
                 .thenReturn(response);
@@ -73,20 +75,21 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void shouldReturn401_whenNoAuthentication() throws Exception{
+        void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 post("/books")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
             )
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_UNAUTHORIZED));;
         }
         
         @Test
         @WithMockUser
         @DisplayName("Should return 201 Created when accessed with authentication")
-        public void shouldReturn201_whenWithAuthentication() throws Exception{
+        void shouldReturn201_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 post("/books")
@@ -111,7 +114,7 @@ public class BookEndpointSecurityTests {
         );            
 
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             //Arrange
             when(bookService.updateBook(anyLong(), any(BookUpdateRequest.class)))
                 .thenReturn(response);
@@ -119,20 +122,21 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void shouldReturn401_whenNoAuthentication() throws Exception{
+        void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 patch("/books/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
             )
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_UNAUTHORIZED));
         }
         
         @Test
         @WithMockUser
         @DisplayName("Should return 200 Ok when accessed with authentication")
-        public void shouldReturn200_whenWithAuthentication() throws Exception{
+        void shouldReturn200_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 patch("/books/1")
@@ -149,7 +153,7 @@ public class BookEndpointSecurityTests {
     class GetBookSecurityTests{
 
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             //Arrange
             when(bookService.getBook(anyLong()))
                 .thenReturn(response);
@@ -157,18 +161,19 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void shouldReturn401_whenNoAuthentication() throws Exception{
+        void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books/1")
             )
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_UNAUTHORIZED));;
         }
         
         @Test
         @WithMockUser
         @DisplayName("Should return 200 Ok when accessed with authentication")
-        public void shouldReturn200_whenWithAuthentication() throws Exception{
+        void shouldReturn200_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books/1")
@@ -185,7 +190,7 @@ public class BookEndpointSecurityTests {
         private final PaginatedResponse<BookResponse> response = new PaginatedResponse<>(0, 0, 0, 0L, null);
 
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             //Arrange
             when(bookService.getBooks(any(Pageable.class), any(BookFiltering.class)))
                 .thenReturn(response);
@@ -193,18 +198,19 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void shouldReturn401_whenNoAuthentication() throws Exception{
+        void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books")
             )
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_UNAUTHORIZED));;
         }
         
         @Test
         @WithMockUser
         @DisplayName("Should return 200 Ok when accessed with authentication")
-        public void shouldReturn200_whenWithAuthentication() throws Exception{
+        void shouldReturn200_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books")
@@ -219,7 +225,7 @@ public class BookEndpointSecurityTests {
     class DeleteBookSecurityTests{
 
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             //Arrange
             doNothing().when(bookService)
                 .deleteBook(anyLong());
@@ -227,18 +233,19 @@ public class BookEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void shouldReturn401_whenNoAuthentication() throws Exception{
+        void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 delete("/books/1")
             )
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_UNAUTHORIZED));;
         }
         
         @Test
         @WithMockUser
         @DisplayName("Should return 204 No Content when accessed with authentication")
-        public void shouldReturn204_whenWithAuthentication() throws Exception{
+        void shouldReturn204_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 delete("/books/1")

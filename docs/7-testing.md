@@ -62,3 +62,5 @@ Loads the full application with a random port (`webEnvironment = RANDOM_PORT`) t
 Utilizes `TestRestClient` to test the api.
 
 Focus on the correct function (happy path) of each endpoint and the return of the appropriate error responses in case of failure (error path).
+
+End to end tests have a `PER_CLASS` test lifecycle because it is necessary for successful authentication. Since some api endpoints require authentication it is necessary to have a user present in the databse. To register said user it is necessary to persist it before each test (because of database cleanup) with a password hash, which is generated once inside of the `@BeforeAll` method with a `PasswordEncoder` dependency injected after test class instantiation.

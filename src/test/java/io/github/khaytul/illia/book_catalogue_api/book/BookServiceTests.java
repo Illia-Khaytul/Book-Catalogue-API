@@ -60,7 +60,7 @@ public class BookServiceTests {
         
         @Test
         @DisplayName("Should throw DuplicateEntryException when title and author are not unique")
-        public void shouldThrowDuplicateEntryException_whenBookAlreadyExists() {
+        void shouldThrowDuplicateEntryException_whenBookAlreadyExists() {
             //Arrange
             when(bookRepository.existsByTitleAndAuthor(request.title(), request.author()))
                 .thenReturn(true);
@@ -76,7 +76,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should create and save book when title and author are unique")
-        public void shouldSaveAndReturnResponse_whenBookDoesNotExist(){
+        void shouldSaveAndReturnResponse_whenBookDoesNotExist(){
             //Arrange
             Book savedBook = new Book(
                 1L,
@@ -111,7 +111,7 @@ public class BookServiceTests {
         
         @Test
         @DisplayName("Should map the request to the book entity before saving it")
-        public void shouldMapRequestToEntity() {
+        void shouldMapRequestToEntity() {
             //Arrange
             when(bookRepository.existsByTitleAndAuthor(request.title(), request.author()))
                 .thenReturn(false);
@@ -160,7 +160,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should throw EntityNotFoundException when book not found by id")
-        public void shouldThrowEntityNotFoundException_whenBookIsNotFound(){
+        void shouldThrowEntityNotFoundException_whenBookIsNotFound(){
             //Arrange
             when(bookRepository.findById(bookId))
                 .thenReturn(Optional.empty());
@@ -176,8 +176,8 @@ public class BookServiceTests {
         }
 
         @Test
-        @DisplayName("Should return found book when request is empty")
-        public void shouldReturnFoundBookResponse_whenRequestIsEmpty(){
+        @DisplayName("Should return found book response when request is empty")
+        void shouldReturnFoundBookResponse_whenRequestIsEmpty(){
             //Arrange
             BookUpdateRequest request = new BookUpdateRequest(null, null, null, null, null);
 
@@ -203,7 +203,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should throw DuplicateEntryException when updated title and author are not unique")
-        public void shouldThrowDuplicateEntryException_whenUpdatedBookAlreadyExists(){
+        void shouldThrowDuplicateEntryException_whenUpdatedBookAlreadyExists(){
             //Arrange
             when(bookRepository.findById(bookId))
                 .thenReturn(Optional.of(foundBook));
@@ -222,7 +222,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should not check for duplicates when title and author do not change")
-        public void shouldNotVerifyDuplicateExistance_whenUpdatedBookTitleAndAuthorDoNotChange(){
+        void shouldNotVerifyDuplicateExistence_whenUpdatedBookTitleAndAuthorDoNotChange(){
             //Arrange
             BookUpdateRequest request = new BookUpdateRequest(null, null, null, 0, null);
             
@@ -242,7 +242,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should update and save book when title and author are unique")
-        public void shouldSaveAndReturnResponse_whenUpdatedBookDoesNotExist(){
+        void shouldSaveAndReturnResponse_whenUpdatedBookDoesNotExist(){
             //Arrange
             when(bookRepository.findById(bookId))
                 .thenReturn(Optional.of(foundBook));
@@ -270,7 +270,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should update found book with request before saving it")
-        public void shouldUpdateBookWithRequest(){
+        void shouldUpdateBookWithRequest(){
             //Arrange
             when(bookRepository.findById(bookId))
                 .thenReturn(Optional.of(foundBook));
@@ -305,7 +305,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should throw EntityNotFoundException when book not found by id")
-        public void shouldThrowEntityNotFoundException_whenBookIsNotFound(){
+        void shouldThrowEntityNotFoundException_whenBookIsNotFound(){
             //Arrange
             when(bookRepository.findById(bookId))
                 .thenReturn(Optional.empty());
@@ -319,8 +319,8 @@ public class BookServiceTests {
         }
 
         @Test
-        @DisplayName("Should return found book when book is found by id")
-        public void shouldReturnResponse_whenBookIsFound(){
+        @DisplayName("Should return found book response when book is found by id")
+        void shouldReturnResponse_whenBookIsFound(){
             //Arrange
             Book foundBook = new Book(
                 1L,
@@ -361,7 +361,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should build specification and return mapped book page")
-        public void shouldReturnMappedPageOfBooks(){
+        void shouldReturnMappedPageOfBooks(){
             //Arrange
             @SuppressWarnings("unchecked")
             Specification<Book> spec = mock(Specification.class);
@@ -412,7 +412,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should throw EntityNotFoundException when book with id does not exist")
-        public void shouldThrowEntityNotFoundException_whenBookDoesNotExist(){
+        void shouldThrowEntityNotFoundException_whenBookDoesNotExist(){
             //Arrange
             when(bookRepository.existsById(bookId))
                 .thenReturn(false);
@@ -428,7 +428,7 @@ public class BookServiceTests {
 
         @Test
         @DisplayName("Should delete book when book with id exists")
-        public void shouldDeleteBookById_whenBookExists(){
+        void shouldDeleteBookById_whenBookExists(){
             //Arrange
             when(bookRepository.existsById(bookId))
                 .thenReturn(true);

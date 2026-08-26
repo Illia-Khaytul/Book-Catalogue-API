@@ -40,7 +40,7 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
     private Book book3;
 
     @BeforeEach
-    public void beforeEach(){
+    void beforeEach(){
         book1 = new Book(
             null,
             "Cool Book Vol.1",
@@ -78,7 +78,7 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
 
     @Test
     @DisplayName("Should return all books when BookFiltering is empty")
-    public void shouldReturnAllBooks_whenFilteringEmpty(){
+    void shouldReturnAllBooks_whenFilteringEmpty(){
         //Arrange
         BookFiltering filtering = new BookFiltering(null, null, null, null, null, null);
 
@@ -94,7 +94,7 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
     
     @Test
     @DisplayName("Should return books where title contains titleContains value")
-    public void shouldReturnBooksWhereTitleContainsValue(){
+    void shouldReturnBooksWhereTitleContainsValue(){
         //Arrange
         BookFiltering filtering = new BookFiltering("Cool", null, null, null, null, null);
 
@@ -110,7 +110,7 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
     
     @Test
     @DisplayName("Should return books where author contains authorName value")
-    public void shouldReturnBooksWhereAuthorNameContainsValue(){
+    void shouldReturnBooksWhereAuthorNameContainsValue(){
         //Arrange
         BookFiltering filtering = new BookFiltering(null, "Different", null, null, null, null);
 
@@ -126,7 +126,7 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
     
     @Test
     @DisplayName("Should return books where pages is equal or greater than value")
-    public void shouldReturnBooksWithMinPages(){
+    void shouldReturnBooksWithMinPages(){
         //Arrange
         BookFiltering filtering = new BookFiltering(null, null, book2.getPages(), null, null, null);
 
@@ -142,7 +142,7 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
     
     @Test
     @DisplayName("Should return books where pages is equal or less value")
-    public void shouldReturnBooksWithMaxPages(){
+    void shouldReturnBooksWithMaxPages(){
         //Arrange
         BookFiltering filtering = new BookFiltering(null, null, null, book2.getPages(), null, null);
 
@@ -158,7 +158,7 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
     
     @Test
     @DisplayName("Should return books where release date is same or after date value")
-    public void shouldReturnBooksReleasedAfterDate(){
+    void shouldReturnBooksReleasedAfterDate(){
         //Arrange
         BookFiltering filtering = new BookFiltering(null, null, null, null, null, book2.getReleaseDate());
 
@@ -174,7 +174,7 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
     
     @Test
     @DisplayName("Should return books where release date is same or before date value")
-    public void shouldReturnBooksReleasedBeforeDate(){
+    void shouldReturnBooksReleasedBeforeDate(){
         //Arrange
         BookFiltering filtering = new BookFiltering(null, null, null, null, book2.getReleaseDate(), null);
 
@@ -190,7 +190,7 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
     
     @Test
     @DisplayName("Should return books with min pages and released after date value")
-    public void shouldReturnBooksByMinPagesAndReleasedAfter(){
+    void shouldReturnBooksByMinPagesAndReleasedAfter(){
         //Arrange
         BookFiltering filtering = new BookFiltering(null, null, book2.getPages(), null, null, book2.getReleaseDate());
 

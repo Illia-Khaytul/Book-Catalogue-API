@@ -18,7 +18,7 @@ import io.github.khaytul.illia.book_catalogue_api.config.SliceTestcontainersConf
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-@DisplayName("UserRespository tests")
+@DisplayName("UserRepository tests")
 public class UserRepositoryTests extends SliceTestcontainersConfig{
 
     @Autowired
@@ -32,7 +32,7 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
 
         @Test
         @DisplayName("Should return true when user exists by username")
-        public void shouldReturnTrue_whenUserExists(){
+        void shouldReturnTrue_whenUserExists(){
             //Arrange
             User user = new User();
             user.setUsername("username");
@@ -48,7 +48,7 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
 
         @Test
         @DisplayName("Should return false when user does not exist by username")
-        public void shouldReturnFalse_whenUserDoesNotExist(){
+        void shouldReturnFalse_whenUserDoesNotExist(){
             //Act
             boolean exists = userRepository.existsByUsername("not exists");
 
@@ -64,7 +64,7 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
         
         @Test
         @DisplayName("Should return user optional when user exists by username")
-        public void shouldReturnUser_whenUserExists(){
+        void shouldReturnUser_whenUserExists(){
             //Arrange
             User user = new User();
             user.setUsername("username");
@@ -81,7 +81,7 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
 
         @Test
         @DisplayName("Should return empty optional when user does not exist by username")
-        public void shouldReturnEmpty_whenUserDoesNotExist(){
+        void shouldReturnEmpty_whenUserDoesNotExist(){
             //Act
             Optional<User> optional = userRepository.findByUsername("not exists");
 
@@ -97,7 +97,7 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
         
         @Test
         @DisplayName("Should delete user by id")
-        public void shouldDeleteUserById(){
+        void shouldDeleteUserById(){
             //Arrange
             User user = new User();
             user.setUsername("username");

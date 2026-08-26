@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import io.github.khaytul.illia.book_catalogue_api.user.UserController;
 import io.github.khaytul.illia.book_catalogue_api.user.UserService;
 import io.github.khaytul.illia.book_catalogue_api.user.request.PasswordChangeRequest;
 import io.github.khaytul.illia.book_catalogue_api.user.request.UserCreateRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import tools.jackson.databind.ObjectMapper;
 
 @WebMvcTest(UserController.class)
@@ -53,7 +55,7 @@ public class UserEndpointSecurityTests {
         );
 
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             //Arrange
             doNothing().when(userService)
                 .createUser(request);
@@ -61,7 +63,7 @@ public class UserEndpointSecurityTests {
 
         @Test
         @DisplayName("Should return 201 Created when accessed with no authentication")
-        public void shouldReturn201_whenNoAuthentication() throws Exception{
+        void shouldReturn201_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 post("/users")
@@ -74,7 +76,7 @@ public class UserEndpointSecurityTests {
         @Test
         @WithMockUser
         @DisplayName("Should return 201 Created when accessed with authentication")
-        public void shouldReturn201_whenWithAuthentication() throws Exception{
+        void shouldReturn201_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 post("/users")
@@ -96,7 +98,7 @@ public class UserEndpointSecurityTests {
         );
 
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             //Arrange
             doNothing().when(userService)
                 .changePassword(any(PasswordChangeRequest.class));
@@ -104,20 +106,21 @@ public class UserEndpointSecurityTests {
         
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void shouldReturn401_whenNoAuthentication() throws Exception{
+        void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 patch("/users/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
             )
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_UNAUTHORIZED));;
         }
         
         @Test
         @WithMockUser
         @DisplayName("Should return 200 Ok when accessed with authentication")
-        public void shouldReturn200_whenWithAuthentication() throws Exception{
+        void shouldReturn200_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 patch("/users/password")
@@ -133,7 +136,7 @@ public class UserEndpointSecurityTests {
     class DeleteUserSecurityTests{
         
         @BeforeEach
-        public void beforeEach(){
+        void beforeEach(){
             //Arrange
             doNothing().when(userService)
                 .deleteUser();
@@ -141,18 +144,19 @@ public class UserEndpointSecurityTests {
         
         @Test
         @DisplayName("Should return 401 Unauthorized when accessed with no authentication")
-        public void shouldReturn401_whenNoAuthentication() throws Exception{
+        void shouldReturn401_whenNoAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 delete("/users")
             )
-            .andExpect(status().isUnauthorized());
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_UNAUTHORIZED));;
         }
         
         @Test
         @WithMockUser
         @DisplayName("Should return 204 No Content when accessed with authentication")
-        public void shouldReturn204_whenWithAuthentication() throws Exception{
+        void shouldReturn204_whenWithAuthentication() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 delete("/users")

@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
         
         return new ErrorResponse(
             HttpStatus.BAD_REQUEST, 
-            "Invalid payload parameters",
+            "Invalid request parameters",
             errors
         );
     }

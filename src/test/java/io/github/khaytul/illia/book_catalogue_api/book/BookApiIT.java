@@ -58,7 +58,7 @@ public class BookApiIT {
     private HttpHeaders headers;
 
     @BeforeAll
-    public void beforeAll(){
+    void beforeAll(){
         passwordHash = passwordEncoder.encode(password);
         
         headers = new HttpHeaders();
@@ -67,14 +67,14 @@ public class BookApiIT {
     }
 
     @BeforeEach
-    public void beforeEach(){
+    void beforeEach(){
         User user = new User(null, username, passwordHash);
 
         userRepository.save(user);
     }
 
     @AfterEach
-    public void afterEach(){
+    void afterEach(){
         userRepository.deleteAll();
         bookRepository.deleteAll();
     }
@@ -85,7 +85,7 @@ public class BookApiIT {
 
         @Test
         @DisplayName("Should create new book")
-        public void shouldCreateNewBook(){
+        void shouldCreateNewBook(){
             //Arrange
             BookCreateRequest request = new BookCreateRequest(
                 "Cool Book Vol.1",
@@ -99,14 +99,18 @@ public class BookApiIT {
             restClient
                 .post()
                 .uri("/books")
-                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .headers(httpHeaders -> httpHeaders.putAll(headers))
                 .body(request)
             .exchange()
                 .expectStatus().isCreated()
                 .expectHeader().valueMatches("Location", "/api/v1/books/\\d+")
                 .expectBody(BookResponse.class).value(response -> {
+                    assertThat(response.id()).isNotNull();
                     assertThat(response.title()).isEqualTo(request.title());
+                    assertThat(response.description()).isEqualTo(request.description());
                     assertThat(response.author()).isEqualTo(request.author());
+                    assertThat(response.pages()).isEqualTo(request.pages());
+                    assertThat(response.releaseDate()).isEqualTo(request.releaseDate());
 
                     assertThat(bookRepository.existsById(response.id())).isTrue();
                 });
@@ -114,7 +118,7 @@ public class BookApiIT {
 
         @Test
         @DisplayName("Should update existing book")
-        public void shouldUpdateExistingBook(){
+        void shouldUpdateExistingBook(){
             //Arrange
             long bookId;
             Book book = new Book(
@@ -141,14 +145,16 @@ public class BookApiIT {
                 .expectBody(BookResponse.class).value(response -> {
                     assertThat(response.id()).isEqualTo(bookId);
                     assertThat(response.title()).isEqualTo(book.getTitle());
+                    assertThat(response.description()).isEqualTo(book.getDescription());
                     assertThat(response.author()).isEqualTo(book.getAuthor());
                     assertThat(response.pages()).isEqualTo(request.pages());
+                    assertThat(response.releaseDate()).isEqualTo(book.getReleaseDate());
                 });
         }
         
         @Test
         @DisplayName("Should get existing book")
-        public void shouldGetExistingBook(){
+        void shouldGetExistingBook(){
             //Arrange
             long bookId;
             Book book = new Book(
@@ -173,13 +179,16 @@ public class BookApiIT {
                 .expectBody(BookResponse.class).value(response -> {
                     assertThat(response.id()).isEqualTo(bookId);
                     assertThat(response.title()).isEqualTo(book.getTitle());
+                    assertThat(response.description()).isEqualTo(book.getDescription());
                     assertThat(response.author()).isEqualTo(book.getAuthor());
+                    assertThat(response.pages()).isEqualTo(book.getPages());
+                    assertThat(response.releaseDate()).isEqualTo(book.getReleaseDate());
                 });
         }
         
         @Test
         @DisplayName("Should get a page of books")
-        public void shouldGetAPageOfBooks(){
+        void shouldGetAPageOfBooks(){
             //Arrange
             int page = 0;
             int pageSize = 2;
@@ -204,6 +213,10 @@ public class BookApiIT {
             .exchange()
                 .expectStatus().isOk()
                 .expectBody(responseType).value(response -> {
+                    assertThat(response.page()).isEqualTo(page);
+                    assertThat(response.totalPages()).isEqualTo(books.size() / pageSize + 1);
+                    assertThat(response.pageSize()).isEqualTo(pageSize);
+                    assertThat(response.totalElements()).isEqualTo(books.size());
                     assertThat(response.content().stream().map(book -> book.id()))
                         .containsAnyElementsOf(books.stream().map(book -> book.getId()).toList());
                 });
@@ -211,7 +224,7 @@ public class BookApiIT {
         
         @Test
         @DisplayName("Should delete existing book")
-        public void shouldDeleteExistingBook(){
+        void shouldDeleteExistingBook(){
             //Arrange
             long bookId;
             Book book = new Book(
@@ -247,7 +260,7 @@ public class BookApiIT {
         
         @Test
         @DisplayName("Should return 409 Conflict when book already exists")
-        public void shouldReturn409_whenCreatingExistingBook(){
+        void shouldReturn409_whenCreatingExistingBook(){
             //Arrange
             Book book = new Book(
                 null,
@@ -272,18 +285,21 @@ public class BookApiIT {
             restClient
                 .post()
                 .uri("/books")
-                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .headers(httpHeaders -> httpHeaders.putAll(headers))
                 .body(request)
             .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT)
                 .expectBody(ErrorResponse.class).value(response -> {
+                    assertThat(response.timestamp()).isNotNull();
                     assertThat(response.status()).isEqualTo(HttpServletResponse.SC_CONFLICT);
+                    assertThat(response.message()).isEqualTo(String.format("A book with title '%s' by '%s' already exists", request.title(), request.author()));
+                    assertThat(response.data()).isEmpty();
                 });
         }
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessing with no authentication")
-        public void shouldReturn401_whenNoAuthentication(){
+        void shouldReturn401_whenNoAuthentication(){
             //Arrange
             long bookId = 1;
             BookUpdateRequest request = new BookUpdateRequest(null, null, null, 1, null);
@@ -296,13 +312,16 @@ public class BookApiIT {
             .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody(ErrorResponse.class).value(response -> {
+                    assertThat(response.timestamp()).isNotNull();
                     assertThat(response.status()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
+                    assertThat(response.message()).isEqualTo("Full authentication is required to access this resource");
+                    assertThat(response.data()).isEmpty();
                 });
         }
         
         @Test
         @DisplayName("Should return 404 Not Found when book does not exist")
-        public void shouldReturn404_whenBookDoesNotExist(){
+        void shouldReturn404_whenBookDoesNotExist(){
             //Arrange
             long bookId = 1;
 
@@ -314,13 +333,16 @@ public class BookApiIT {
             .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class).value(response -> {
+                    assertThat(response.timestamp()).isNotNull();
                     assertThat(response.status()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
+                    assertThat(response.message()).isEqualTo(String.format("Book with id '%s' does not exist", bookId));
+                    assertThat(response.data()).isEmpty();
                 });
         }
         
         @Test
         @DisplayName("Should return 400 Bad Request when invalid request parameters")
-        public void shouldReturn400_whenInvalidRequest(){
+        void shouldReturn400_whenInvalidRequest(){
             //Arrange
             String titleContains = "";
             int minPages = -1;
@@ -339,7 +361,11 @@ public class BookApiIT {
             .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorResponse.class).value(response -> {
+                    assertThat(response.timestamp()).isNotNull();
                     assertThat(response.status()).isEqualTo(HttpServletResponse.SC_BAD_REQUEST);
+                    assertThat(response.message()).isEqualTo("Invalid request parameters");
+                    assertThat(response.data().get("titleContains")).isEqualTo("size must be between 1 and 100");
+                    assertThat(response.data().get("minPages")).isEqualTo("must be greater than or equal to 0");
                 });
         }
         

@@ -45,7 +45,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 409 Conflict when caught DuplicateEntryException")
-    public void shouldReturn409_whenCaughtDuplicateEntryException() throws Exception{
+    void shouldReturn409_whenCaughtDuplicateEntryException() throws Exception{
         //Arrange
         DuplicateEntryException exception = new DuplicateEntryException("message");
 
@@ -65,7 +65,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 404 Not Found when caught EntityNotFoundException")
-    public void shouldReturn404_whenCaughtEntityNotFoundException() throws Exception{
+    void shouldReturn404_whenCaughtEntityNotFoundException() throws Exception{
         //Arrange
         EntityNotFoundException exception = new EntityNotFoundException("message");
 
@@ -85,7 +85,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 400 Bad Request when caught InvalidPasswordException")
-    public void shouldReturn400_whenCaughtInvalidPasswordException() throws Exception{
+    void shouldReturn400_whenCaughtInvalidPasswordException() throws Exception{
         //Arrange
         InvalidPasswordException exception = new InvalidPasswordException("message");
 
@@ -105,7 +105,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 400 Bad Request when caught MethodArgumentNotValidException")
-    public void shouldReturn400_whenCaughtMethodArgumentNotValidException() throws Exception{
+    void shouldReturn400_whenCaughtMethodArgumentNotValidException() throws Exception{
         //Act and Assert
         mockMvc.perform(
             get("/books")
@@ -117,14 +117,14 @@ public class GlobalExceptionHandlerTests {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.timestamp").isNotEmpty())
         .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-        .andExpect(jsonPath("$.message").value("Invalid payload parameters"))
+        .andExpect(jsonPath("$.message").value("Invalid request parameters"))
         .andExpect(jsonPath("$.data.titleContains").value("size must be between 1 and 100"))
         .andExpect(jsonPath("$.data.minPages").value("must be greater than or equal to 0"));
     }
 
     @Test
     @DisplayName("Should return 400 Bad Request when caught ConstraintViolationException")
-    public void shouldReturn400_whenCaughtConstraintViolationException() throws Exception{
+    void shouldReturn400_whenCaughtConstraintViolationException() throws Exception{
         //Act and Assert
         mockMvc.perform(
             get("/books/{bookId}", -1)
@@ -138,7 +138,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 409 Conflict when caught OptimisticLockingFailureException")
-    public void shouldReturn409_whenCaughtOptimisticLockingFailureException() throws Exception{
+    void shouldReturn409_whenCaughtOptimisticLockingFailureException() throws Exception{
         //Arrange
         when(bookService.getBook(anyLong()))
             .thenThrow(new OptimisticLockingFailureException("message"));
@@ -156,7 +156,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 401 Unauthorized when caught UserNotAuthenticatedException")
-    public void shouldReturn401_whenCaughtUserNotAuthenticatedException() throws Exception{
+    void shouldReturn401_whenCaughtUserNotAuthenticatedException() throws Exception{
         //Arrange
         when(bookService.getBook(anyLong()))
             .thenThrow(new UserNotAuthenticatedException("message"));
@@ -178,7 +178,7 @@ public class GlobalExceptionHandlerTests {
 
         @Test
         @DisplayName("Should return 409 Conflict when a unique constraint is violated")
-        public void shouldReturn409_whenUniqueConstraintViolation() throws Exception{
+        void shouldReturn409_whenUniqueConstraintViolation() throws Exception{
             //Arrange
             ConstraintViolationException cve = new ConstraintViolationException("message", new SQLException(), "unique_constraint");
 
@@ -198,7 +198,7 @@ public class GlobalExceptionHandlerTests {
 
         @Test
         @DisplayName("Should return 500 Internal Server Error when caught unexpected DataIntegrityViolationException")
-        public void shouldReturn500_whenUnexpectedDataIntegrityViolationException() throws Exception{
+        void shouldReturn500_whenUnexpectedDataIntegrityViolationException() throws Exception{
             //Arrange
             when(bookService.getBook(anyLong()))
                 .thenThrow(new DataIntegrityViolationException("message", new RuntimeException()));
@@ -218,7 +218,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 404 Not Found when caught NoResourceFoundException")
-    public void shouldReturn404_whenCaughtNoResourceFoundException() throws Exception{
+    void shouldReturn404_whenCaughtNoResourceFoundException() throws Exception{
         //Act and Assert
         mockMvc.perform(
             get("/non-existing-mapping")
@@ -232,7 +232,7 @@ public class GlobalExceptionHandlerTests {
 
     @Test
     @DisplayName("Should return 500 Internal Server Error when caught unexpected Exception")
-    public void shouldReturn500_whenCaughtUnexpectedException() throws Exception{
+    void shouldReturn500_whenCaughtUnexpectedException() throws Exception{
         //Arrange
         when(bookService.getBook(anyLong()))
             .thenThrow(new RuntimeException());

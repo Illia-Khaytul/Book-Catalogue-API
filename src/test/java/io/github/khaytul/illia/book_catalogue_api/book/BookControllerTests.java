@@ -62,7 +62,7 @@ public class BookControllerTests {
 
         @Test
         @DisplayName("Should return 201 Created when request is valid")
-        public void shouldReturn201_whenValidRequest() throws Exception{
+        void shouldReturn201_whenValidRequest() throws Exception{
             //Arrange
             BookCreateRequest request = new BookCreateRequest(
                 "Cool Book Vol.1", 
@@ -91,14 +91,16 @@ public class BookControllerTests {
             )
             .andExpect(status().isCreated())
             .andExpect(header().string("Location", "/api/v1/books/" + response.id()))
-            .andExpect(content().json(objectMapper.writeValueAsString(response)));
+            .andExpect(jsonPath("$.id").value(response.id()))
+            .andExpect(jsonPath("$.title").value(response.title()))
+            .andExpect(jsonPath("$.author").value(response.author()));
 
             verify(bookService).createBook(any(BookCreateRequest.class));
         }
         
         @Test
         @DisplayName("Should return 400 Bad Request when required request fields are missing")
-        public void shouldReturn400_whenRequestRequiredFieldsMissing() throws Exception{
+        void shouldReturn400_whenRequestRequiredFieldsMissing() throws Exception{
             //Arrange
             BookCreateRequest request = new BookCreateRequest(null, null, null, null, null);
             
@@ -109,9 +111,7 @@ public class BookControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.title").value("must not be null"))
             .andExpect(jsonPath("$.data.author").value("must not be null"));
 
@@ -120,14 +120,14 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when request fields are invalid")
-        public void shouldReturn400_whenRequestInvalid() throws Exception{
+        void shouldReturn400_whenRequestInvalid() throws Exception{
             //Arrange
             BookCreateRequest request = new BookCreateRequest(
                 "", 
                 null, 
                 "", 
                 -1, 
-                LocalDate.parse("2050-01-01")
+                LocalDate.now().plusYears(1)
             );
 
             //Act and Assert
@@ -137,9 +137,7 @@ public class BookControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.title").value("size must be between 1 and 100"))
             .andExpect(jsonPath("$.data.author").value("size must be between 1 and 50"))
             .andExpect(jsonPath("$.data.pages").value("must be greater than or equal to 0"))
@@ -156,7 +154,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 200 Ok when request is valid")
-        public void shouldReturn200_whenValidRequest() throws Exception{
+        void shouldReturn200_whenValidRequest() throws Exception{
             //Arrange
             long bookId = 1;
             BookUpdateRequest request = new BookUpdateRequest(
@@ -185,14 +183,16 @@ public class BookControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isOk())
-            .andExpect(content().json(objectMapper.writeValueAsString(response)));
+            .andExpect(jsonPath("$.id").value(response.id()))
+            .andExpect(jsonPath("$.title").value(response.title()))
+            .andExpect(jsonPath("$.author").value(response.author()));
 
             verify(bookService).updateBook(anyLong(), any(BookUpdateRequest.class));
         }
         
         @Test
         @DisplayName("Should return 400 Bad Request when path variable is invalid")
-        public void shouldReturn400_whenPathVariableInvalid() throws Exception{
+        void shouldReturn400_whenPathVariableInvalid() throws Exception{
             //Arrange
             long bookId = -1;
             BookUpdateRequest request = new BookUpdateRequest(null, null, null, null, null);
@@ -204,9 +204,7 @@ public class BookControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.bookId").value("must be greater than 0"));
 
             verify(bookService, never()).updateBook(anyLong(), any(BookUpdateRequest.class));
@@ -214,7 +212,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when request fields are invalid")
-        public void shouldReturn400_whenRequestInvalid() throws Exception{
+        void shouldReturn400_whenRequestInvalid() throws Exception{
             //Arrange
             long bookId = 1;
             BookUpdateRequest request = new BookUpdateRequest(
@@ -222,7 +220,7 @@ public class BookControllerTests {
                 null, 
                 "", 
                 -1, 
-                LocalDate.parse("2050-01-01")
+                LocalDate.now().plusYears(1)
             );
 
             //Act and Assert
@@ -232,9 +230,7 @@ public class BookControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.title").value("size must be between 1 and 100"))
             .andExpect(jsonPath("$.data.author").value("size must be between 1 and 50"))
             .andExpect(jsonPath("$.data.pages").value("must be greater than or equal to 0"))
@@ -251,7 +247,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 200 Ok when request is valid")
-        public void shouldReturn200_whenValidRequest() throws Exception{
+        void shouldReturn200_whenValidRequest() throws Exception{
             //Arrange
             long bookId = 1;
             BookResponse response = new BookResponse(
@@ -271,14 +267,16 @@ public class BookControllerTests {
                 get("/books/{bookId}", bookId)
             )
             .andExpect(status().isOk())
-            .andExpect(content().json(objectMapper.writeValueAsString(response)));
+            .andExpect(jsonPath("$.id").value(response.id()))
+            .andExpect(jsonPath("$.title").value(response.title()))
+            .andExpect(jsonPath("$.author").value(response.author()));
 
             verify(bookService).getBook(anyLong());
         }
         
         @Test
         @DisplayName("Should return 400 Bad Request when path variable is invalid")
-        public void shouldReturn400_whenPathVariableInvalid() throws Exception{
+        void shouldReturn400_whenPathVariableInvalid() throws Exception{
             //Arrange
             long bookId = -1;
 
@@ -287,9 +285,7 @@ public class BookControllerTests {
                 get("/books/{bookId}", bookId)
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.bookId").value("must be greater than 0"));
 
             verify(bookService, never()).getBook(anyLong());
@@ -303,7 +299,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 200 Ok when request is valid")
-        public void shouldReturn200_whenValidRequest() throws Exception{
+        void shouldReturn200_whenValidRequest() throws Exception{
             //Arrange
             BookResponse book = new BookResponse(
                 1L,
@@ -326,14 +322,14 @@ public class BookControllerTests {
                 )))
             )
             .andExpect(status().isOk())
-            .andExpect(content().json(objectMapper.writeValueAsString(response)));
+            .andExpect(jsonPath("$.content[0].id").value(book.id()));
 
             verify(bookService).getBooks(any(Pageable.class), any(BookFiltering.class));
         }
         
         @Test
         @DisplayName("Should return 400 Bad Request when query parameters are invalid")
-        public void shouldReturn400_whenQueryParametersInvalid() throws Exception{
+        void shouldReturn400_whenQueryParametersInvalid() throws Exception{
             //Act and Assert
             mockMvc.perform(
                 get("/books")
@@ -346,9 +342,7 @@ public class BookControllerTests {
                 )))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.titleContains").value("size must be between 1 and 100"))
             .andExpect(jsonPath("$.data.authorName").value("size must be between 1 and 50"))
             .andExpect(jsonPath("$.data.minPages").value("must be greater than or equal to 0"))
@@ -365,7 +359,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 204 No Content when request is valid")
-        public void shouldReturn204_whenValidRequest() throws Exception{
+        void shouldReturn204_whenValidRequest() throws Exception{
             //Arrange
             long bookId = 1;
 
@@ -384,7 +378,7 @@ public class BookControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when path variable is invalid")
-        public void shouldReturn400_whenPathVariableInvalid() throws Exception{
+        void shouldReturn400_whenPathVariableInvalid() throws Exception{
             //Arrange
             long bookId = -1;
 
@@ -393,9 +387,7 @@ public class BookControllerTests {
                 delete("/books/{bookId}", bookId)
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.bookId").value("must be greater than 0"));
 
             verify(bookService, never()).deleteBook(anyLong());

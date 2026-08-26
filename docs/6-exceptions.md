@@ -40,7 +40,7 @@ Fields:
 
 **MethodArgumentNotValidException handler** -> 400 Bad Request
 
-`message` = Invalid payload parameters
+`message` = Invalid request parameters
 
 `data` = validation errors
 

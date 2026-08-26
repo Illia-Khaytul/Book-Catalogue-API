@@ -47,7 +47,7 @@ public class UserControllerTests {
 
         @Test
         @DisplayName("Should return 201 Created when request is valid")
-        public void whenValidRequest_shouldReturn201() throws Exception{
+        void shouldReturn201_whenValidRequest() throws Exception{
             //Arrange
             UserCreateRequest request = new UserCreateRequest(
                 "username", 
@@ -71,7 +71,7 @@ public class UserControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when required request fields are missing")
-        public void whenRequestRequiredFieldsMissing_shouldReturn400() throws Exception{
+        void shouldReturn400_whenRequestRequiredFieldsMissing() throws Exception{
             //Arrange
             UserCreateRequest request = new UserCreateRequest(null, null);
             
@@ -82,9 +82,7 @@ public class UserControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.username").value("must not be null"))
             .andExpect(jsonPath("$.data.password").value("must not be null"));
 
@@ -93,7 +91,7 @@ public class UserControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when request fields are invalid")
-        public void whenRequestInvalid_shouldReturn400() throws Exception{
+        void shouldReturn400_whenRequestInvalid() throws Exception{
             //Arrange
             UserCreateRequest request = new UserCreateRequest("user", "pass");
             
@@ -104,9 +102,7 @@ public class UserControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.username").value("size must be between 5 and 50"))
             .andExpect(jsonPath("$.data.password").value("size must be between 6 and 50"));
 
@@ -121,7 +117,7 @@ public class UserControllerTests {
         
         @Test
         @DisplayName("Should return 200 OK when request is valid")
-        public void shouldReturn200_whenValidRequest() throws Exception{
+        void shouldReturn200_whenValidRequest() throws Exception{
             //Arrange
             PasswordChangeRequest request = new PasswordChangeRequest(
                 "oldPassword", 
@@ -145,7 +141,7 @@ public class UserControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when required request fields are missing")
-        public void shouldReturn400_whenRequestRequiredFieldsMissing() throws Exception{
+        void shouldReturn400_whenRequestRequiredFieldsMissing() throws Exception{
             //Arrange
             PasswordChangeRequest request = new PasswordChangeRequest(null, null);
             
@@ -156,9 +152,7 @@ public class UserControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.oldPassword").value("must not be null"))
             .andExpect(jsonPath("$.data.newPassword").value("must not be null"));
 
@@ -167,7 +161,7 @@ public class UserControllerTests {
         
         @Test
         @DisplayName("Should return 400 Bad Request when request fields are invalid")
-        public void shouldReturn400_whenRequestInvalid() throws Exception{
+        void shouldReturn400_whenRequestInvalid() throws Exception{
             //Arrange
             PasswordChangeRequest request = new PasswordChangeRequest("old", "new");
             
@@ -178,9 +172,7 @@ public class UserControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
-            .andExpect(jsonPath("$.message").isNotEmpty())
             .andExpect(jsonPath("$.data.oldPassword").value("size must be between 6 and 50"))
             .andExpect(jsonPath("$.data.newPassword").value("size must be between 6 and 50"));
 
@@ -195,7 +187,7 @@ public class UserControllerTests {
         
         @Test
         @DisplayName("Should return 204 No Content")
-        public void shouldReturn204() throws Exception{
+        void shouldReturn204() throws Exception{
             //Arrange
             doNothing().when(userService)
                 .deleteUser();

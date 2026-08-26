@@ -33,22 +33,19 @@ public class BookRetryableIT {
     @Autowired
     private BookService bookService;
 
-    private Book original;
-    private BookUpdateRequest request;
+    private final Book original = new Book(1L, "Cool Book Vol.1", null, "Original Author", null, null, null);
+    private final BookUpdateRequest request = new BookUpdateRequest(null, null, null, 0, null);
 
     @BeforeEach
-    public void beforeEach(){
+    void beforeEach(){
         //Arrange
-        original = new Book(1L, "Cool Book Vol.1", null, "Original Author", null, null, null);
-        request = new BookUpdateRequest(null, null, null, 0, null);
-
         when(bookRepository.findById(original.getId()))
             .thenReturn(Optional.of(original));
     }
 
     @Test
     @DisplayName("Should succeed when no OptimisticLockingFailureException is thrown")
-    public void shouldSucceed_whenNoRetries(){
+    void shouldSucceed_whenNoRetries(){
         //Arrange
         when(bookRepository.save(any(Book.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
@@ -63,7 +60,7 @@ public class BookRetryableIT {
     
     @Test
     @DisplayName("Should succeed when OptimisticLockingFailureException is thrown")
-    public void shouldSucceed_whenOptimisticLockingFailureExceptionIsThrown(){
+    void shouldSucceed_whenOptimisticLockingFailureExceptionIsThrown(){
         //Arrange
         when(bookRepository.save(any(Book.class)))
             .thenThrow(new OptimisticLockingFailureException("message"))
@@ -79,7 +76,7 @@ public class BookRetryableIT {
     
     @Test
     @DisplayName("Should throw OptimisticLockingFailureException when no more retries available")
-    public void shouldThrowOptimisticLockingFailureException_whenAllRetriesUsed(){
+    void shouldThrowOptimisticLockingFailureException_whenAllRetriesUsed(){
         //Arrange
         when(bookRepository.save(any(Book.class)))
             .thenThrow(new OptimisticLockingFailureException("message"));

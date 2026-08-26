@@ -47,7 +47,7 @@ public class UserServiceTests {
 
         @Test
         @DisplayName("Should throw DuplicateEntryException when username is taken")
-        public void shouldThrowDuplicateEntryException_whenUsernameAlreadyExists() {
+        void shouldThrowDuplicateEntryException_whenUsernameAlreadyExists() {
             //Arrange
             when(userRepository.existsByUsername(request.username()))
                 .thenReturn(true);
@@ -64,7 +64,7 @@ public class UserServiceTests {
 
         @Test
         @DisplayName("Should create and save user when username is not taken")
-        public void shouldEncodePasswordAndSave_whenUserDoesNotExist(){
+        void shouldEncodePasswordAndSave_whenUserDoesNotExist(){
             //Arrange
             when(userRepository.existsByUsername(request.username()))
                 .thenReturn(false);
@@ -97,16 +97,11 @@ public class UserServiceTests {
     class ChangePasswordTests{
 
         private final PasswordChangeRequest request = new PasswordChangeRequest("password", "newPassword");
-        private User authUser;
-
-        @BeforeEach
-        public void beforeEach(){
-            authUser = new User(1L, "username", "password");
-        }
+        private final User authUser = new User(1L, "username", "password");
 
         @Test
         @DisplayName("Should throw InvalidPasswordException when new password is the same as old password")
-        public void shouldThrowInvalidPasswordException_whenNewPasswordMatchesOldPassword(){
+        void shouldThrowInvalidPasswordException_whenNewPasswordMatchesOldPassword(){
             //Arrange
             PasswordChangeRequest request = new PasswordChangeRequest(this.request.oldPassword(), this.request.oldPassword());
 
@@ -126,7 +121,7 @@ public class UserServiceTests {
 
         @Test
         @DisplayName("Should throw InvalidPasswordException when old password does not match current password")
-        public void shouldThrowInvalidPasswordException_whenCurrentAndOldPasswordDoNotMatch(){
+        void shouldThrowInvalidPasswordException_whenCurrentAndOldPasswordDoNotMatch(){
             //Arrange
             when(securityUtils.loadAuthenticatedUser())
                 .thenReturn(authUser);
@@ -146,7 +141,7 @@ public class UserServiceTests {
 
         @Test
         @DisplayName("Should change user password when new password is valid")
-        public void shouldChangeUserPasswordAndSave_whenNewPasswordIsValid(){
+        void shouldChangeUserPasswordAndSave_whenNewPasswordIsValid(){
             //Arrange
             String authUserPassword = authUser.getPassword();
 
@@ -187,7 +182,7 @@ public class UserServiceTests {
 
         @Test
         @DisplayName("Should fetch authenticated user id and delete user")
-        public void shouldDeleteAuthenticatedUser(){
+        void shouldDeleteAuthenticatedUser(){
             //Arrange
             when(securityUtils.getAuthenticatedUserDetails())
                 .thenReturn(userDetails);

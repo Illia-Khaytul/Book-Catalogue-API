@@ -48,7 +48,7 @@ public class UserApiIT {
     private HttpHeaders headers;
 
     @BeforeAll
-    public void beforeAll(){
+    void beforeAll(){
         passwordHash = passwordEncoder.encode(password);
         
         headers = new HttpHeaders();
@@ -57,14 +57,14 @@ public class UserApiIT {
     }
 
     @BeforeEach
-    public void beforeEach(){
+    void beforeEach(){
         User user = new User(null, username, passwordHash);
 
         userRepository.save(user);
     }
 
     @AfterEach
-    public void afterEach(){
+    void afterEach(){
         userRepository.deleteAll();
     }
 
@@ -74,7 +74,7 @@ public class UserApiIT {
 
         @Test
         @DisplayName("Should create new user")
-        public void shouldCreateNewUser(){
+        void shouldCreateNewUser(){
             //Arrange
             UserCreateRequest request = new UserCreateRequest("newUser", password);
 
@@ -92,7 +92,7 @@ public class UserApiIT {
         
         @Test
         @DisplayName("Should change authenticated user password")
-        public void shouldChangeCurrentUserPassword(){
+        void shouldChangeCurrentUserPassword(){
             //Arrange
             String newPassword = "newPassword";
             PasswordChangeRequest request = new PasswordChangeRequest(password, newPassword);
@@ -114,7 +114,7 @@ public class UserApiIT {
 
         @Test
         @DisplayName("Should delete authenticated user")
-        public void shouldDeleteCurrentUser(){
+        void shouldDeleteCurrentUser(){
             //Act and Assert
             restClient
                 .delete()
@@ -135,7 +135,7 @@ public class UserApiIT {
         
         @Test
         @DisplayName("Should return 409 Conflict when user already exists")
-        public void shouldReturn409_whenCreatingExistingUser(){
+        void shouldReturn409_whenCreatingExistingUser(){
             //Arrange
             UserCreateRequest request = new UserCreateRequest(username, password);
 
@@ -147,13 +147,16 @@ public class UserApiIT {
             .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT)
                 .expectBody(ErrorResponse.class).value(response -> {
+                    assertThat(response.timestamp()).isNotNull();
                     assertThat(response.status()).isEqualTo(HttpServletResponse.SC_CONFLICT);
+                    assertThat(response.message()).isEqualTo("User with provided username already exists");
+                    assertThat(response.data()).isEmpty();
                 });
         }
         
         @Test
         @DisplayName("Should return 400 Bad Request when passing invalid password")
-        public void shouldReturn400_whenInvalidPassword(){
+        void shouldReturn400_whenInvalidPassword(){
             //Arrange
             PasswordChangeRequest request = new PasswordChangeRequest(password, password);
 
@@ -166,13 +169,16 @@ public class UserApiIT {
             .exchange()
                 .expectStatus().isBadRequest()
                 .expectBody(ErrorResponse.class).value(response -> {
+                    assertThat(response.timestamp()).isNotNull();
                     assertThat(response.status()).isEqualTo(HttpServletResponse.SC_BAD_REQUEST);
+                    assertThat(response.message()).isEqualTo("New password cannot be the same as old password");
+                    assertThat(response.data()).isEmpty();
                 });
         }
 
         @Test
         @DisplayName("Should return 401 Unauthorized when accessing with no authentication")
-        public void shouldReturn401_whenNoAuthentication(){
+        void shouldReturn401_whenNoAuthentication(){
             //Act and Assert
             restClient
                 .delete()
@@ -180,7 +186,10 @@ public class UserApiIT {
             .exchange()
                 .expectStatus().isUnauthorized()
                 .expectBody(ErrorResponse.class).value(response -> {
+                    assertThat(response.timestamp()).isNotNull();
                     assertThat(response.status()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
+                    assertThat(response.message()).isEqualTo("Full authentication is required to access this resource");
+                    assertThat(response.data()).isEmpty();
                 });
         }
 
