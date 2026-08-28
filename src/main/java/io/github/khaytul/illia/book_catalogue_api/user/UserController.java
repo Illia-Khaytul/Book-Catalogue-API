@@ -40,8 +40,7 @@ public class UserController {
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Operation successful"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
-        @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response"),
-        @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
+        @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response")
     })
     public void createUser(
         @Validated @RequestBody UserCreateRequest request
@@ -59,8 +58,7 @@ public class UserController {
         @ApiResponse(responseCode = "200", description = "Operation successful"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
-        @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response"),
-        @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
+        @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response")
     })
     public void changePassword(
         @Validated @RequestBody PasswordChangeRequest request
@@ -75,8 +73,7 @@ public class UserController {
         """)
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Operation successful"),
-        @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
-        @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
+        @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response")
     })
     public void deleteUser(){
         userService.deleteUser();

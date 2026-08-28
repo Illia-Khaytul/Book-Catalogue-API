@@ -13,7 +13,7 @@ import io.github.khaytul.illia.book_catalogue_api.user.UserRepository;
 @Component
 public class SecurityUtils {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public SecurityUtils(UserRepository userRepository){
         this.userRepository = userRepository;

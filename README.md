@@ -1,10 +1,11 @@
 # Book Catalogue API
 
-Basic book cataloguing rest api that allows for book management and implements basic security measures.
+Basic book cataloguing rest api that allows for book management and implements basic security measures. Created for learning purposes.
 
 ## 1. Overview
 
 This api allows to create, read, update and delete books (crud operations) through the exposed endpoints.
+
 It also implements basic username-password security (http basic) and allows for user registration, password change and deletion.
 
 ## 2. Tech Stack
@@ -14,9 +15,9 @@ It also implements basic username-password security (http basic) and allows for 
 - Spring Web MVC
 - Spring Security
 - SpringDoc
-- Spring DotEnv
 - Lombok
 - PostgreSQL 18
+- Docker
 - JUnit 5
 - Mockito
 - Spring Boot Test
@@ -26,65 +27,139 @@ It also implements basic username-password security (http basic) and allows for 
 
 - Java 21+
 - Maven 3.9.19 (or higher)
-- PostgreSQL database (e.g. pgAdmin 4)
-- Docker Engine (for testcontainers)
+- PostgreSQL 18
+- Docker Engine
 
 ## 4. Getting Started
 
+**Repository:**
+
 First clone the repository to your machine.
 
-```bash
+```cmd
 git clone https://github.com/Illia-Khaytul/Book-Catalogue-API.git
 ```
 
-or
+or with ssh
 
-```bash
+```cmd
 git clone git@github.com:Illia-Khaytul/Book-Catalogue-API.git
 ```
 
-Then configure the required environmental variables used in the application. 
-This application uses the Spring DotEnv library to load the environment variable from a `.env` file located at the project root.
+## Run for Development
 
-```text
-DEV_DATABASE_USERNAME=db_username
-DEV_DATABASE_PASSWORD=db_password
-DEV_DATABASE_URL=//db_ip:db_port/db_name
+**Environment variables:**
 
-PROD_DATABASE_USERNAME=db_username
-PROD_DATABASE_PASSWORD=db_password
-PROD_DATABASE_URL=//db_ip:db_port/db_name
+Configure the required environmental variables used by dev application profile.
+
+```cmd
+setx DEV_DATABASE_NAME "your dev database name"
+setx DEV_DATABASE_USERNAME "your dev db username"
+setx DEV_DATABASE_PASSWORD "your dev db password"
 ```
 
-The `datasource.url` in the `application.properties` file already contains the `jdbc:postgresql:` prefix and expects just the address of the database itself.
+These commands create user environmental variables.
 
-Select your desired profile (dev/prod) in the `application.properties` file.
+Restart your IDE so it picks up the variables.
+
+**Docker:**
+
+This project uses Docker containers for development databases, which is why it is important to set up the container before using the application.
+
+Make sure Docker Engine is running. Use this command to verify:
+
+```cmd
+docker ps
+```
+
+This command shows the list of containers and their status if Docker is running and and ERROR message if not.
+
+Verify the necessary database port is free.
+
+```cmd
+netstat -ano | findstr :5433
+```
+
+Port 5433 is the port configured in the `docker-compose.yaml` that the database container will use. 
+
+If it's free the command will return nothing. 
+If it's occupied the command will return the information of the network connection utilizing it. 
+In that case choose a free port and modify the left number (e.g. in `ports: - "5433:5432"` change the 5433) of the `services:postgres:ports:` parameter in the `docker-compose.yaml` file to that port.
+
+Then initialize the container.
+
+```cmd
+docker compose up
+```
+
+or to not lock the terminal
+
+```cmd
+docker compose up -d
+```
+
+The container will start up and the database will be generated automatically if initialized for the first time.
+If the container has been initialized before, simply start it.
+
+```cmd
+docker compose start
+```
+
+**Run the application:**
+
+Finally start the application.
+
+```cmd
+mvn spring-boot:run
+```
+
+The default profile is `dev`, so no command line arguments or property changes are required.
+
+Now the application is available at `http://localhost:8080/api/v1`.
+
+### Run for Production
+
+This project does not use docker containers for the production database, so it must be configured separately.
+
+**Environment variables:**
+
+Configure the required environmental variables used by prod application profile.
+
+```cmd
+setx PROD_DATABASE_NAME "your prod database name"
+setx PROD_DATABASE_USERNAME "your prod db username"
+setx PROD_DATABASE_PASSWORD "your prod db password"
+```
+
+Restart your IDE so it picks up the variables.
+
+**Run the application:**
+
+Select the `prod` profile in the `application.properties` file.
 
 ```text
-spring.profiles.active=dev
+spring.profiles.active=prod
 ```
 
 Or as a command line argument during startup.
 
-```bash
-mvn spring-boot:run "-Dspring-boot.run.profiles=dev"
+```cmd
+mvn spring-boot:run "-Dspring-boot.run.profiles=prod"
 ```
-
-By default the `dev` profile is selected.
 
 Finally start the application.
 
-```bash
+```cmd
 mvn spring-boot:run
 ```
 
-Now the application is available at `http://localhost:8080/api/v1`
+Now the application is available at `http://localhost:8080/api/v1`.
 
 ## 5. API Documentation
 
 The API documentation is automatically generated with SpringDoc.
 
-It is available at `http://localhost:8080/api/v1/swagger-ui/index.html` on the `dev` profile.
+It is available at `http://localhost:8080/api/v1/swagger-ui/index.html` for the `dev` profile.
 
 ## 6. Security
 
@@ -96,25 +171,25 @@ Then use your username and password to authenticate successfully.
 
 ## 7. Run Tests
 
-Features unit tests for service classes and components, slice tests for controllers and repositories, and integration tests for full application testing.
+Features unit tests for service classes and components, slice tests for controllers and repositories, and integration tests for component interaction and end to end testing.
 
 Utilizes Testcontainers for test databases.
 
-To run the tests first make sure the Docker Engine is running. Run the following command to test it:
+To run the tests first make sure the Docker Engine is running. Use the `docker ps` command to verify.
 
-```bash
-docker ps
-```
+Then run the tests:
 
-This command shows the list of containers and their status if Docker is running and and ERROR message if not.
-
-Then execute this command to run the tests:
-
-```bash
+```cmd
 mvn test
 ```
 
-## 8. Project Structure
+## 8. Architecture
+
+This project utilizes a layered architecture due to its simplicity.
+
+User request -> Controller -> Service -> Repository -> Database
+
+## 9. Project Structure
 
 The project is structured by domain, where each folder contains the classes related by meaning.
 1. `book` contains all the classes responsible for operating with books.
@@ -124,11 +199,13 @@ The project is structured by domain, where each folder contains the classes rela
 5. `common` contains small classes and utilities used in multiple places.
 6. `openapi` contains the openapi configuration.
 
-## 9. Design Documentation
+## 10. Design Documentation
 
 The design documentation is located at the [/docs](/docs/1-overview.md) folder.
 
-## 10. Known Limitations
+## 11. Known Limitations
+
+This is a learning project and thus has several limitations and weaknesses preventing it from being production grade.
 
 The current api allows anyone to create a user and start editing the books. Normally this would be a security risk, but in this case it was an intentional decision. This project was kept intentionally simple for learning purposes while still showcasing the implementation of different technologies such as spring security.
 

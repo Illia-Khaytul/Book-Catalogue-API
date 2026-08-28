@@ -16,11 +16,12 @@ Exceptions thrown by the application.
 - `MethodArgumentNotValidException`: when `@Validated` validation fails
 - `ConstraintViolationException`: when `@Valid` validation fails
 - `OptimisticLockingFailureException`: when concurrent entity modification is detected
+- `HttpMessageNotReadableException`: when the request body is malformed
 - `NoResourceFoundException`: when no exposed endpoint matches the request
 
 ## 2. Application exception handling
 
-All exceptions return a common `error response` to keep the format consistent.
+All exceptions return a common `error response` to keep the response consistent.
 
 Fields:
 - Instant `timestamp`: when was the response sent
@@ -61,6 +62,10 @@ Catches DataIntegrityViolationException and extracts its cause. If the cause is 
 `message` = Unique constraint violated
 
 It is a necessary handler because even though service operations check for duplicates it is still possible for a concurrent operation to create a duplicate before the first one saves, thus violating the uniqueness constraint. Spring automatically wraps the ConstraintViolationException into a DataIntegrityViolationException, which impedes normal handling. It is better to notify the user about the uniqueness violation rather than returning a generic 500 Internal Server Error response, therefore this handler is required. It is a safe check because all unique constraints are prefixed with "unique_".
+
+**HttpMessageNotReadableException handler** -> 400 Bad Request
+
+`message` = Invalid request body
 
 **NoResourceFoundException handler** -> 404 Not Found
 

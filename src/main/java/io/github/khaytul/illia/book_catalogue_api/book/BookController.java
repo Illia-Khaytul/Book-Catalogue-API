@@ -58,8 +58,7 @@ public class BookController {
         @ApiResponse(responseCode = "201", ref = "#/components/responses/book_created_response"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
-        @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response"),
-        @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
+        @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response")
     })
     public ResponseEntity<BookResponse> createBook(
         @Validated @RequestBody BookCreateRequest request
@@ -85,8 +84,7 @@ public class BookController {
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
         @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response"),
-        @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response"),
-        @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
+        @ApiResponse(responseCode = "409", ref = "#/components/responses/409_response")
     })
     public BookResponse updateBook(
         @Valid @PathVariable @Positive long bookId,
@@ -106,8 +104,7 @@ public class BookController {
         @ApiResponse(responseCode = "200", ref = "#/components/responses/book_success_response"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
-        @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response"),
-        @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
+        @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response")
     })
     public BookResponse getBook(
         @Valid @PathVariable @Positive long bookId
@@ -125,8 +122,7 @@ public class BookController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", ref = "#/components/responses/book_page_response"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
-        @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
-        @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
+        @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response")
     })
     public PaginatedResponse<BookResponse> getBooks(
         @PageableDefault(page = 0, size = 20, sort = "id", direction = Direction.DESC) Pageable pagination,
@@ -146,8 +142,7 @@ public class BookController {
         @ApiResponse(responseCode = "204", description = "Operation successful"),
         @ApiResponse(responseCode = "400", ref = "#/components/responses/400_response"),
         @ApiResponse(responseCode = "401", ref = "#/components/responses/401_response"),
-        @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response"),
-        @ApiResponse(responseCode = "500", ref = "#/components/responses/500_response")
+        @ApiResponse(responseCode = "404", ref = "#/components/responses/404_response")
     })
     public void deleteBook(
         @Valid @PathVariable @Positive long bookId

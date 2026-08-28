@@ -89,7 +89,7 @@ Deletes an existing book by provided id.
 **Returns:** nothing
 
 Notes:
-- Deletes the book directly without loading it into the persistence context. Requires transaction.
+- Deletes the book directly without loading it into the persistence context to avoid optimistic locking. Requires transaction.
 - No need to check if the book exists (in case it gets deleted mid operation) because the operation deletes it anyways.
 
 
@@ -148,5 +148,4 @@ Deletes the accessing user.
 **Returns:** nothing
 
 Notes:
-- Deletes user directly without loading it into the persistence context. Requires transaction.
 - No need to check if the user exists (in case the user gets deleted mid operation) because the operation deletes it anyways.

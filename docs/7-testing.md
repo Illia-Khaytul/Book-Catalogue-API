@@ -9,6 +9,8 @@ Configures Testcontainers in 2 ways.
 - An abstract parent class with a static instance that allows reuse across test classes for tests that load only part of the context (e.g. `DataJpaTest` tests).
 Both configurations are located under the `/config` folder in the test folder.
 
+Disables the base servlet path for testing with the `test` profile for consistent test behavior.
+
 ## 1. Unit tests
 
 Unit tests for services and helper components.

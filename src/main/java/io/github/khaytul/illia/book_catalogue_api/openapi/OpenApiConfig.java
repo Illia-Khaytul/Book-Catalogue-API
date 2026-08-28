@@ -79,10 +79,6 @@ public class OpenApiConfig {
             .addResponses(
                 "409_response", 
                 buildExceptionApiResponse("Entity parameter conflict", new ErrorResponse(HttpStatus.CONFLICT, "A book with title 'book1' by 'author' already exists"))
-            )
-            .addResponses(
-                "500_response", 
-                buildExceptionApiResponse("Unexpected error", new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong"))
             );
 
         addSchema(components, BookResponse.class);

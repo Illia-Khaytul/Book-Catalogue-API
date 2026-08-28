@@ -187,14 +187,14 @@ public class UserServiceTests {
             when(securityUtils.getAuthenticatedUserDetails())
                 .thenReturn(userDetails);
             doNothing().when(userRepository)
-                .deleteUserDirectly(userDetails.getUserId());
+                .deleteById(userDetails.getUserId());
 
             //Act
             userService.deleteUser();
 
             //Assert
             verify(securityUtils).getAuthenticatedUserDetails();
-            verify(userRepository).deleteUserDirectly(userDetails.getUserId());
+            verify(userRepository).deleteById(userDetails.getUserId());
         }
 
     }

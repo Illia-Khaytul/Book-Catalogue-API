@@ -204,4 +204,26 @@ public class BookSpecificationBuilderIT extends SliceTestcontainersConfig{
         assertThat(books.stream().map(book -> book.id())).containsExactlyInAnyOrder(book2.getId());
     }
     
+    @Test
+    @DisplayName("Should return book that matches all the specifications")
+    void shouldReturnBookThatMatchesAllSpecifications(){
+        //Arrange
+        BookFiltering filtering = new BookFiltering(
+            "Cool",
+            "Author",
+            90,
+            200,
+            LocalDate.parse("2026-01-01"),
+            LocalDate.parse("2025-01-01")
+        );
+
+        //Act
+        PaginatedResponse<BookResponse> response = bookService.getBooks(pagination, filtering);
+
+        //Assert
+        assertThat(response).isNotNull();
+        List<BookResponse> books = response.content();
+        assertThat(books).hasSize(1);
+        assertThat(books.stream().map(book -> book.id())).containsExactlyInAnyOrder(book1.getId());
+    }
 }

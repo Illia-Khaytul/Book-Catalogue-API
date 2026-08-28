@@ -91,27 +91,4 @@ public class UserRepositoryTests extends SliceTestcontainersConfig{
 
     }
     
-    @Nested
-    @DisplayName("deleteUserDirectly tests")
-    class DeleteUserDirectlyTests{
-        
-        @Test
-        @DisplayName("Should delete user by id")
-        void shouldDeleteUserById(){
-            //Arrange
-            User user = new User();
-            user.setUsername("username");
-            user.setPassword("password");
-            user = entityManager.persistAndFlush(user);
-
-            //Act
-            userRepository.deleteUserDirectly(user.getId());
-            entityManager.clear();
-
-            //Assert
-            assertThat(entityManager.find(User.class, user.getId())).isNull();
-        }
-        
-    }
-    
 }

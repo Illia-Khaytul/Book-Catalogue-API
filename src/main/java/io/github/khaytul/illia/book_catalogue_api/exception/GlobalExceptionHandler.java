@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -138,6 +139,17 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR, 
                 "Something went wrong"
             ));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse httpMessageNotReadableHandler(HttpMessageNotReadableException e){
+        log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
+        
+        return new ErrorResponse(
+            HttpStatus.BAD_REQUEST, 
+            "Invalid request body"
+        );
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

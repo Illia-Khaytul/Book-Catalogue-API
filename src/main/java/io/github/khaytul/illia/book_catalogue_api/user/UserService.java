@@ -74,7 +74,6 @@ public class UserService {
         log.info("User password successfully changed for user with id {}", user.getId());
     }
 
-    @Transactional
     public void deleteUser() {
         log.info("Deleting current user");
 
@@ -82,7 +81,7 @@ public class UserService {
         Long userId = securityUtils.getAuthenticatedUserDetails().getUserId();
         
         log.debug("Deleting user");
-        userRepository.deleteUserDirectly(userId);
+        userRepository.deleteById(userId);
 
         log.info("Successfully deleted user with id {}", userId);
     }

@@ -3,6 +3,7 @@ package io.github.khaytul.illia.book_catalogue_api.exception;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,6 +19,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -214,6 +216,22 @@ public class GlobalExceptionHandlerTests {
             .andExpect(jsonPath("$.data").isEmpty());
         }
 
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request when caught HttpMessageNotReadableException")
+    void shouldReturn400_whenCaughtHttpMessageNotReadableException() throws Exception{
+        //Act and Assert
+        mockMvc.perform(
+            post("/books")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("expected a json")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.timestamp").isNotEmpty())
+        .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
+        .andExpect(jsonPath("$.message").value("Invalid request body"))
+        .andExpect(jsonPath("$.data").isEmpty());
     }
 
     @Test
