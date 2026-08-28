@@ -14,9 +14,10 @@ It also implements basic username-password security (http basic) and allows for 
 - Spring Data JPA
 - Spring Web MVC
 - Spring Security
+- PostgreSQL 18
+- Flyway
 - SpringDoc
 - Lombok
-- PostgreSQL 18
 - Docker
 - JUnit 5
 - Mockito
@@ -27,7 +28,6 @@ It also implements basic username-password security (http basic) and allows for 
 
 - Java 21+
 - Maven 3.9.19 (or higher)
-- PostgreSQL 18
 - Docker Engine
 
 ## 4. Getting Started

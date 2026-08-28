@@ -1,6 +1,9 @@
 package io.github.khaytul.illia.book_catalogue_api.book;
 
+import java.sql.Types;
 import java.time.LocalDate;
+
+import org.hibernate.annotations.JdbcTypeCode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +40,7 @@ public class Book {
     @Column(nullable = false)
     private String title;
 
-    @Lob
+    @JdbcTypeCode(Types.LONGVARCHAR)
     private String description;
 
     @Column(nullable = false)

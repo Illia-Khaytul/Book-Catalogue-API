@@ -2,7 +2,9 @@
 
 Entity design.
 
-All unique constraints are prefixed with "unique_"
+All unique constraints are prefixed with "unique_".
+
+Utilizes Flyway to generate the schema.
 
 ## 1. Book
 
