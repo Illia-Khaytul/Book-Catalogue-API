@@ -1,19 +1,19 @@
 # Book Catalogue API
 
-This is a learning project that demonstrates the use of Spring Boot to create a simple REST API with basic user authentication, a layered architecture and realistic testing.
+This is a learning project that demonstrates building a REST API with Spring Boot, including a basic user authentication, layered architecture and realistic testing.
 
 It showcases:
 - Spring Data JPA and Specifications for filtering and pagination
-- Spring Security with Http Basic and BCrypt for password encoding
+- Spring Security with HTTP Basic and BCrypt for password encoding
 - Flyway for database migrations
-- SpringDoc for api documentation
+- SpringDoc for API documentation
 - Docker with Testcontainers for realistic testing
 
 ## 1. Overview
 
-This api allows to create, read, update and delete books (crud operations) through the exposed endpoints.
+This API allows to create, read, update and delete books (crud operations) through the exposed endpoints.
 
-It also implements basic username-password security (http basic) and allows for user registration, password change and deletion.
+It also implements basic username-password security (HTTP Basic) and allows for user registration, password change and deletion.
 
 ## 2. Tech Stack
 

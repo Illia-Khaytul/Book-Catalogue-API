@@ -8,7 +8,7 @@ Security configuration and component definition.
 - Disable `sessions`.
 - Disable `form login`.
 - Enable `http basic` authentication.
-- Authorize http requests:
+- Authorize HTTP requests:
     - No auth for `/users` and `open api` endpoints.
     - Require authentication for everything else.
 
