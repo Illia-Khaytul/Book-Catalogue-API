@@ -90,7 +90,7 @@ public class BookControllerTests {
                 .content(objectMapper.writeValueAsString(request))
             )
             .andExpect(status().isCreated())
-            .andExpect(header().string("Location", "/api/v1/books/" + response.id()))
+            .andExpect(header().string("Location", String.format("http://localhost/books/%s", response.id())))
             .andExpect(jsonPath("$.id").value(response.id()))
             .andExpect(jsonPath("$.title").value(response.title()))
             .andExpect(jsonPath("$.author").value(response.author()));

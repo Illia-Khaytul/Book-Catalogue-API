@@ -1,6 +1,13 @@
 # Book Catalogue API
 
-Basic book cataloguing rest api that allows for book management and implements basic security measures. Created for learning purposes.
+This is a learning project that demonstrates the use of Spring Boot to create a simple REST API with basic user authentication, a layered architecture and realistic testing.
+
+It showcases:
+- Spring Data JPA and Specifications for filtering and pagination
+- Spring Security with Http Basic and BCrypt for password encoding
+- Flyway for database migrations
+- SpringDoc for api documentation
+- Docker with Testcontainers for realistic testing
 
 ## 1. Overview
 
@@ -30,7 +37,23 @@ It also implements basic username-password security (http basic) and allows for 
 - Maven 3.9.19 (or higher)
 - Docker Engine
 
-## 4. Getting Started
+## 4. Architecture
+
+This project utilizes a layered architecture due to its simplicity.
+
+User request -> Controller -> Service -> Repository -> Database
+
+## 5. Project Structure
+
+The project is structured by domain, where each folder contains the classes related by meaning.
+1. `book` contains all the classes responsible for operating with books.
+2. `user` contains all the classes responsible for operating with users.
+3. `security` contains the security configuration and services.
+4. `exception` contains the custom exceptions and handling.
+5. `common` contains small classes and utilities used in multiple places.
+6. `openapi` contains the openapi configuration.
+
+## 6. Getting Started
 
 **Repository:**
 
@@ -155,21 +178,21 @@ mvn spring-boot:run
 
 Now the application is available at `http://localhost:8080/api/v1`.
 
-## 5. API Documentation
+## 7. API Documentation
 
 The API documentation is automatically generated with SpringDoc.
 
 It is available at `http://localhost:8080/api/v1/swagger-ui/index.html` for the `dev` profile.
 
-## 6. Security
+## 8. Security
 
 The application uses a basic username-password authentication method (http basic).
 All endpoints for book operation as well as user password change and deletion require it.
 
-To access the endpoints it is required to create a new user with a unique username (see `create` operation in the api documentation).
+To access the endpoints it is required to create a new user with a unique username (see `create` operation in the API documentation).
 Then use your username and password to authenticate successfully.
 
-## 7. Run Tests
+## 9. Run Tests
 
 Features unit tests for service classes and components, slice tests for controllers and repositories, and integration tests for component interaction and end to end testing.
 
@@ -177,27 +200,17 @@ Utilizes Testcontainers for test databases.
 
 To run the tests first make sure the Docker Engine is running. Use the `docker ps` command to verify.
 
-Then run the tests:
+Then run the tests.
+
+```cmd
+mvn verify
+```
+
+or just the unit tests
 
 ```cmd
 mvn test
 ```
-
-## 8. Architecture
-
-This project utilizes a layered architecture due to its simplicity.
-
-User request -> Controller -> Service -> Repository -> Database
-
-## 9. Project Structure
-
-The project is structured by domain, where each folder contains the classes related by meaning.
-1. `book` contains all the classes responsible for operating with books.
-2. `user` contains all the classes responsible for operating with users.
-3. `security` contains the security configuration and services.
-4. `exception` contains the custom exceptions and handling.
-5. `common` contains small classes and utilities used in multiple places.
-6. `openapi` contains the openapi configuration.
 
 ## 10. Design Documentation
 
@@ -207,7 +220,7 @@ The design documentation is located at the [/docs](/docs/1-overview.md) folder.
 
 This is a learning project and thus has several limitations and weaknesses preventing it from being production grade.
 
-The current api allows anyone to create a user and start editing the books. Normally this would be a security risk, but in this case it was an intentional decision. This project was kept intentionally simple for learning purposes while still showcasing the implementation of different technologies such as spring security.
+The current API allows anyone to create a user and start editing the books. Normally this would be a security risk, but in this case it was an intentional decision. This project was kept intentionally simple for learning purposes while still showcasing the implementation of different technologies such as spring security.
 
 Password validation is also intentionally weak. For the small scope of this application it was not necessary to add complex password validation (Passay) aside from the current bean validation present in the dtos.
 

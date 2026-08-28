@@ -15,6 +15,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -51,6 +52,9 @@ public class BookApiIT {
     private UserRepository userRepository;
     @Autowired
     private RestTestClient restClient;
+
+    @LocalServerPort
+    private int port;
 
     private final String password = "password";
     private String passwordHash;
@@ -103,7 +107,7 @@ public class BookApiIT {
                 .body(request)
             .exchange()
                 .expectStatus().isCreated()
-                .expectHeader().valueMatches("Location", "/api/v1/books/\\d+")
+                .expectHeader().valueMatches("Location", String.format("http://localhost:%s/books/\\d+", port))
                 .expectBody(BookResponse.class).value(response -> {
                     assertThat(response.id()).isNotNull();
                     assertThat(response.title()).isEqualTo(request.title());

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.github.khaytul.illia.book_catalogue_api.book.request.BookFiltering;
 import io.github.khaytul.illia.book_catalogue_api.book.request.BookCreateRequest;
@@ -66,7 +67,12 @@ public class BookController {
         BookResponse response = bookService.createBook(request);
 
         return ResponseEntity
-            .created(new URI("/api/v1/books/" + response.id()))
+            .created(ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .path("/{bookId}")
+                .buildAndExpand(response.id())
+                .toUri()
+            )
             .body(response);
     }
     
