@@ -1,6 +1,5 @@
 package io.github.khaytul.illia.book_catalogue_api.book;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.springframework.data.domain.Pageable;
