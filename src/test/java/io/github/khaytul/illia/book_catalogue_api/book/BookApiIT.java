@@ -42,7 +42,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("Book end to end api tests")
-public class BookApiIT {
+public class BookApiIT { 
 
     @Autowired
     private PasswordEncoder passwordEncoder;

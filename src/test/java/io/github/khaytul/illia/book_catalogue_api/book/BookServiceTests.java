@@ -48,7 +48,7 @@ public class BookServiceTests {
 
     @Nested
     @DisplayName("createBook tests")
-    class CreateBookTests{
+    class CreateBookTests{ 
 
         private final BookCreateRequest request = new BookCreateRequest(
             "Cool Book Vol.1", 

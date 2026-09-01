@@ -9,7 +9,7 @@ It showcases:
 - SpringDoc for API documentation
 - Docker with Testcontainers for realistic testing
 
-## 1. Overview
+## 1. Overview 
 
 This API allows to create, read, update and delete books (crud operations) through the exposed endpoints.
 
