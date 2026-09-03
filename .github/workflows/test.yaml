@@ -1,16 +1,12 @@
 name: Test
 
 on:
-  push:
-    branches: 
-      - main
   pull_request:
     branches: 
       - main
 
 jobs:
   test:
-    name: Test new features
     runs-on: ubuntu-latest
 
     steps:
