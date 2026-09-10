@@ -1,5 +1,6 @@
 package io.github.khaytul_illia.book_catalogue_api.user;
 
+import io.github.khaytul_illia.book_catalogue_api.user.request.PasswordChangeRequest;
 import io.github.khaytul_illia.book_catalogue_api.user.request.UserCreateRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -100,6 +101,76 @@ public class UserControllerTests {
                 .andExpect(jsonPath("$.data.password").value("size must be between 6 and 50"));
 
             verify(userService, never()).createUser(any(UserCreateRequest.class));
+        }
+
+    }
+
+    @Nested
+    @DisplayName("changePassword tests")
+    class ChangePasswordTests {
+
+        @Test
+        @DisplayName("Should return 200 OK when request is valid")
+        void shouldReturn200_whenValidRequest() throws Exception {
+            //Arrange
+            PasswordChangeRequest request = new PasswordChangeRequest(
+                "oldPassword",
+                "newPassword"
+            );
+
+            doNothing().when(userService)
+                .changePassword(any(PasswordChangeRequest.class));
+
+            //Act and Assert
+            mockMvc.perform(
+                    patch("/users/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+
+            verify(userService).changePassword(any(PasswordChangeRequest.class));
+        }
+
+        @Test
+        @DisplayName("Should return 400 Bad Request when required request fields are missing")
+        void shouldReturn400_whenRequestRequiredFieldsMissing() throws Exception {
+            //Arrange
+            PasswordChangeRequest request = new PasswordChangeRequest(null, null);
+
+            //Act and Assert
+            mockMvc.perform(
+                    patch("/users/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
+                .andExpect(jsonPath("$.data.oldPassword").value("must not be null"))
+                .andExpect(jsonPath("$.data.newPassword").value("must not be null"));
+
+            verify(userService, never()).changePassword(any(PasswordChangeRequest.class));
+        }
+
+        @Test
+        @DisplayName("Should return 400 Bad Request when request fields are invalid")
+        void shouldReturn400_whenRequestInvalid() throws Exception {
+            //Arrange
+            PasswordChangeRequest request = new PasswordChangeRequest("old", "new");
+
+            //Act and Assert
+            mockMvc.perform(
+                    patch("/users/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
+                .andExpect(jsonPath("$.data.oldPassword").value("size must be between 6 and 50"))
+                .andExpect(jsonPath("$.data.newPassword").value("size must be between 6 and 50"));
+
+            verify(userService, never()).changePassword(any(PasswordChangeRequest.class));
         }
 
     }

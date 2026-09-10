@@ -1,6 +1,9 @@
 package io.github.khaytul_illia.book_catalogue_api.user;
 
 import io.github.khaytul_illia.book_catalogue_api.exception.DuplicateEntryException;
+import io.github.khaytul_illia.book_catalogue_api.exception.InvalidPasswordException;
+import io.github.khaytul_illia.book_catalogue_api.security.SecurityUtils;
+import io.github.khaytul_illia.book_catalogue_api.user.request.PasswordChangeRequest;
 import io.github.khaytul_illia.book_catalogue_api.user.request.UserCreateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +29,8 @@ public class UserServiceTests {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private SecurityUtils securityUtils;
     @InjectMocks
     private UserService userService;
 
@@ -78,6 +83,88 @@ public class UserServiceTests {
             verify(userRepository).existsByUsername(request.username());
             verify(passwordEncoder).encode(request.password());
             verify(userRepository).save(any(User.class));
+        }
+
+    }
+
+    @Nested
+    @DisplayName("changePassword tests")
+    class ChangePasswordTests {
+
+        private final PasswordChangeRequest request = new PasswordChangeRequest("password", "newPassword");
+        private final User authUser = new User(1L, "username", "password");
+
+        @Test
+        @DisplayName("Should throw InvalidPasswordException when new password is the same as old password")
+        void shouldThrowInvalidPasswordException_whenNewPasswordMatchesOldPassword() {
+            //Arrange
+            PasswordChangeRequest request = new PasswordChangeRequest(this.request.oldPassword(), this.request.oldPassword());
+
+            when(securityUtils.loadAuthenticatedUser())
+                .thenReturn(authUser);
+
+            //Act and Assert
+            assertThatThrownBy(() -> userService.changePassword(request))
+                .isInstanceOf(InvalidPasswordException.class)
+                .hasMessageContaining("New password cannot be the same as old password");
+
+            verify(securityUtils).loadAuthenticatedUser();
+            verify(passwordEncoder, never()).matches(request.oldPassword(), authUser.getPassword());
+            verify(passwordEncoder, never()).encode(request.newPassword());
+            verify(userRepository, never()).save(authUser);
+        }
+
+        @Test
+        @DisplayName("Should throw InvalidPasswordException when old password does not match current password")
+        void shouldThrowInvalidPasswordException_whenCurrentAndOldPasswordDoNotMatch() {
+            //Arrange
+            when(securityUtils.loadAuthenticatedUser())
+                .thenReturn(authUser);
+            when(passwordEncoder.matches(request.oldPassword(), authUser.getPassword()))
+                .thenReturn(false);
+
+            //Act and Assert
+            assertThatThrownBy(() -> userService.changePassword(request))
+                .isInstanceOf(InvalidPasswordException.class)
+                .hasMessageContaining("Provided old password doesn't match current password");
+
+            verify(securityUtils).loadAuthenticatedUser();
+            verify(passwordEncoder).matches(request.oldPassword(), authUser.getPassword());
+            verify(passwordEncoder, never()).encode(request.newPassword());
+            verify(userRepository, never()).save(authUser);
+        }
+
+        @Test
+        @DisplayName("Should change user password when new password is valid")
+        void shouldChangeUserPasswordAndSave_whenNewPasswordIsValid() {
+            //Arrange
+            String authUserPassword = authUser.getPassword();
+
+            when(securityUtils.loadAuthenticatedUser())
+                .thenReturn(authUser);
+            when(passwordEncoder.matches(request.oldPassword(), authUserPassword))
+                .thenReturn(true);
+            when(passwordEncoder.encode(request.newPassword()))
+                .thenReturn(request.newPassword());
+            when(userRepository.save(authUser))
+                .thenReturn(new User());
+
+            //Act
+            userService.changePassword(request);
+
+            //Assert
+            ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+            verify(userRepository).save(userCaptor.capture());
+
+            User user = userCaptor.getValue();
+            assertThat(user.getId()).isEqualTo(authUser.getId());
+            assertThat(user.getUsername()).isEqualTo(authUser.getUsername());
+            assertThat(user.getPassword()).isEqualTo(request.newPassword());
+
+            verify(securityUtils).loadAuthenticatedUser();
+            verify(passwordEncoder).matches(request.oldPassword(), authUserPassword);
+            verify(passwordEncoder).encode(request.newPassword());
+            verify(userRepository).save(authUser);
         }
 
     }
