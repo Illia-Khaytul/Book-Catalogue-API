@@ -73,7 +73,7 @@ public class UserService {
         Long userId = securityUtils.getAuthenticatedUserDetails().getUserId();
 
         log.debug("Deleting user");
-        userRepository.deleteById(userId);
+        userRepository.deleteDirectlyById(userId);
 
         log.info("Successfully deleted user with id {}", userId);
     }
