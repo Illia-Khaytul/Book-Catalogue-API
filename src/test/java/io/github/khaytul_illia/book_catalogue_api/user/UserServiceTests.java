@@ -2,6 +2,7 @@ package io.github.khaytul_illia.book_catalogue_api.user;
 
 import io.github.khaytul_illia.book_catalogue_api.exception.DuplicateEntryException;
 import io.github.khaytul_illia.book_catalogue_api.exception.InvalidPasswordException;
+import io.github.khaytul_illia.book_catalogue_api.security.AppUserDetails;
 import io.github.khaytul_illia.book_catalogue_api.security.SecurityUtils;
 import io.github.khaytul_illia.book_catalogue_api.user.request.PasswordChangeRequest;
 import io.github.khaytul_illia.book_catalogue_api.user.request.UserCreateRequest;
@@ -165,6 +166,31 @@ public class UserServiceTests {
             verify(passwordEncoder).matches(request.oldPassword(), authUserPassword);
             verify(passwordEncoder).encode(request.newPassword());
             verify(userRepository).save(authUser);
+        }
+
+    }
+
+    @Nested
+    @DisplayName("deleteUser tests")
+    class DeleteUserTests{
+
+        private final AppUserDetails userDetails = new AppUserDetails(new User(1L, "username", "password"));
+
+        @Test
+        @DisplayName("Should fetch authenticated user id and delete user")
+        void shouldDeleteAuthenticatedUser(){
+            //Arrange
+            when(securityUtils.getAuthenticatedUserDetails())
+                .thenReturn(userDetails);
+            doNothing().when(userRepository)
+                .deleteById(userDetails.getUserId());
+
+            //Act
+            userService.deleteUser();
+
+            //Assert
+            verify(securityUtils).getAuthenticatedUserDetails();
+            verify(userRepository).deleteById(userDetails.getUserId());
         }
 
     }

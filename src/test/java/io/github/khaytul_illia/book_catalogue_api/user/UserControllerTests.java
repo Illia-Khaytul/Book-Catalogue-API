@@ -175,4 +175,27 @@ public class UserControllerTests {
 
     }
 
+    @Nested
+    @DisplayName("deleteUser tests")
+    class DeleteUserTests{
+
+        @Test
+        @DisplayName("Should return 204 No Content")
+        void shouldReturn204() throws Exception{
+            //Arrange
+            doNothing().when(userService)
+                .deleteUser();
+
+            //Act and Assert
+            mockMvc.perform(
+                    delete("/users")
+                )
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+            verify(userService).deleteUser();
+        }
+
+    }
+
 }
