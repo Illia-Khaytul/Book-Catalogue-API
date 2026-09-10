@@ -1,0 +1,22 @@
+spring:
+  mvc:
+    servlet:
+      path: /
+  # datasource autoconfigured for testcontainers
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+logging:
+  level:
+    'io.github.khaytul_illia.book_catalogue_api': INFO
