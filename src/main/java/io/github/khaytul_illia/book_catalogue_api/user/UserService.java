@@ -1,6 +1,9 @@
 package io.github.khaytul_illia.book_catalogue_api.user;
 
 import io.github.khaytul_illia.book_catalogue_api.exception.DuplicateEntryException;
+import io.github.khaytul_illia.book_catalogue_api.exception.InvalidPasswordException;
+import io.github.khaytul_illia.book_catalogue_api.security.SecurityUtils;
+import io.github.khaytul_illia.book_catalogue_api.user.request.PasswordChangeRequest;
 import io.github.khaytul_illia.book_catalogue_api.user.request.UserCreateRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,10 +15,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SecurityUtils securityUtils;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, SecurityUtils securityUtils){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.securityUtils = securityUtils;
     }
 
     public void createUser(UserCreateRequest request) {
@@ -37,8 +42,28 @@ public class UserService {
         log.info("New user successfully created with id {}", user.getId());
     }
 
-    public void changePassword() {
+    public void changePassword(PasswordChangeRequest request) {
+        log.info("Changing current user's password");
 
+        log.debug("Fetching authenticated user");
+        User user = securityUtils.loadAuthenticatedUser();
+
+        log.debug("Checking if new password is different from old password");
+        if(request.newPassword().equals(request.oldPassword())){
+            throw new InvalidPasswordException("New password cannot be the same as old password");
+        }
+
+        log.debug("Checking if old passwords match");
+        if(!passwordEncoder.matches(request.oldPassword(), user.getPassword())){
+            throw new InvalidPasswordException("Provided old password doesn't match current password");
+        }
+
+        log.debug("Changing user password");
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+
+        userRepository.save(user);
+
+        log.info("User password successfully changed for user with id {}", user.getId());
     }
 
     public void deleteUser() {

@@ -1,5 +1,6 @@
 package io.github.khaytul_illia.book_catalogue_api.user;
 
+import io.github.khaytul_illia.book_catalogue_api.user.request.PasswordChangeRequest;
 import io.github.khaytul_illia.book_catalogue_api.user.request.UserCreateRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -24,8 +25,11 @@ public class UserController {
     }
 
     @PatchMapping(path = "/password")
-    public void changePassword(){
-
+    @ResponseStatus(HttpStatus.OK)
+    public void changePassword(
+        @Validated @RequestBody PasswordChangeRequest request
+    ){
+        userService.changePassword(request);
     }
 
     @DeleteMapping(path = "")
