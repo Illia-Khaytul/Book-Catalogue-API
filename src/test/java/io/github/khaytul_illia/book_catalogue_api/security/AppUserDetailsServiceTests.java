@@ -31,7 +31,7 @@ public class AppUserDetailsServiceTests {
 
     @Test
     @DisplayName("Should throw UsernameNotFoundException when username does not exist")
-    void shouldThrowUsernameNotFoundException_whenUsernameNotFound(){
+    void shouldThrowUsernameNotFoundException_whenUsernameNotFound() {
         //Arrange
         when(userRepository.findByUsername(username))
             .thenReturn(Optional.empty());
@@ -46,7 +46,7 @@ public class AppUserDetailsServiceTests {
 
     @Test
     @DisplayName("Should return UserDetails when username exists")
-    void shouldReturnUserDetails_whenUsernameExists(){
+    void shouldReturnUserDetails_whenUsernameExists() {
         //Arrange
         User foundUser = new User(1L, username, "password");
 

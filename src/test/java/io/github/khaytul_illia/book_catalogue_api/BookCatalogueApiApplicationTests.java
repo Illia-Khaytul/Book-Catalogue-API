@@ -16,14 +16,14 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @DisplayName("Application loading tests")
 class BookCatalogueApiApplicationTests {
 
-	@Autowired
-	private PostgreSQLContainer postgres;
+    @Autowired
+    private PostgreSQLContainer postgres;
 
-	@Test
-	@DisplayName("Should load application context and start a PostgreSQL testcontainer")
-	void shouldLoadContextAndTestcontainer() {
-		//Assert
-		assertTrue(postgres.isRunning());
-	}
-	
+    @Test
+    @DisplayName("Should load application context and start a PostgreSQL testcontainer")
+    void shouldLoadContextAndTestcontainer() {
+        //Assert
+        assertTrue(postgres.isRunning());
+    }
+
 }

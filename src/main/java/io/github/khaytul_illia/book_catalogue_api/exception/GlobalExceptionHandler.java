@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse methodArgumentNotValidHandler(MethodArgumentNotValidException e){
+    public ErrorResponse methodArgumentNotValidHandler(MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
         e.getBindingResult().getFieldErrors().forEach(
             error -> errors.putIfAbsent(error.getField(), error.getDefaultMessage())
@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handlerMethodValidationHandler(HandlerMethodValidationException e){
+    public ErrorResponse handlerMethodValidationHandler(HandlerMethodValidationException e) {
         Map<String, String> errors = new HashMap<>();
         e.getParameterValidationResults().forEach(
             error -> errors.putIfAbsent(
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse httpMessageNotReadableHandler(HttpMessageNotReadableException e){
+    public ErrorResponse httpMessageNotReadableHandler(HttpMessageNotReadableException e) {
         log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
 
         return new ErrorResponse(
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse noResourceFoundHandler(NoResourceFoundException e){
+    public ErrorResponse noResourceFoundHandler(NoResourceFoundException e) {
         log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
 
         return new ErrorResponse(
@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse exceptionHandler(Exception e){
+    public ErrorResponse exceptionHandler(Exception e) {
         log.error("[EXCEPTION] An unexpected exception has occurred", e);
 
         return new ErrorResponse(

@@ -29,11 +29,11 @@ public class UserRepositoryTests {
 
     @Nested
     @DisplayName("findByUsername tests")
-    class FindByUsernameTests{
+    class FindByUsernameTests {
 
         @Test
         @DisplayName("Should return user optional when user exists by username")
-        void shouldReturnUser_whenUserExists(){
+        void shouldReturnUser_whenUserExists() {
             //Arrange
             User user = new User();
             user.setUsername("username");
@@ -50,7 +50,7 @@ public class UserRepositoryTests {
 
         @Test
         @DisplayName("Should return empty optional when user does not exist by username")
-        void shouldReturnEmpty_whenUserDoesNotExist(){
+        void shouldReturnEmpty_whenUserDoesNotExist() {
             //Act
             Optional<User> optional = userRepository.findByUsername("not exists");
 

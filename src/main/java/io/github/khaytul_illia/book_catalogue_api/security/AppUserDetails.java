@@ -15,7 +15,7 @@ public class AppUserDetails implements UserDetails {
     private String password;
     private Long userId;
 
-    public AppUserDetails(User user){
+    public AppUserDetails(User user) {
         username = user.getUsername();
         password = user.getPassword();
         userId = user.getId();
@@ -36,7 +36,7 @@ public class AppUserDetails implements UserDetails {
         return username;
     }
 
-    public Long getUserId(){
+    public Long getUserId() {
         return userId;
     }
 

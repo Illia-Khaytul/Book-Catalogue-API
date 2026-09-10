@@ -12,10 +12,10 @@ import org.testcontainers.utility.DockerImageName;
 @ImportAutoConfiguration(ServiceConnectionAutoConfiguration.class)
 public class TestcontainersConfiguration {
 
-	@Bean
-	@ServiceConnection
-	public PostgreSQLContainer postgresContainer() {
-		return new PostgreSQLContainer(DockerImageName.parse("postgres:18-alpine"));
-	}
+    @Bean
+    @ServiceConnection
+    public PostgreSQLContainer postgresContainer() {
+        return new PostgreSQLContainer(DockerImageName.parse("postgres:18-alpine"));
+    }
 
 }

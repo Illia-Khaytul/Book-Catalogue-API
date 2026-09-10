@@ -20,7 +20,7 @@ public class AuthenticationExceptionHandler implements AuthenticationEntryPoint 
 
     private final ObjectMapper objectMapper;
 
-    public AuthenticationExceptionHandler(ObjectMapper objectMapper){
+    public AuthenticationExceptionHandler(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
