@@ -67,7 +67,15 @@ public class UserService {
     }
 
     public void deleteUser() {
+        log.info("Deleting current user");
 
+        log.debug("Fetching authenticated user id");
+        Long userId = securityUtils.getAuthenticatedUserDetails().getUserId();
+
+        log.debug("Deleting user");
+        userRepository.deleteById(userId);
+
+        log.info("Successfully deleted user with id {}", userId);
     }
 
 }
