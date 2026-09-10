@@ -47,3 +47,8 @@ Fields:
 Catches any other unexpected exception and logs the stack trace
 
 `message` = Something went wrong
+
+## 3. Security exception handling
+
+A custom `AuthenticationEntryPoint` to handle authentication exceptions in the security filter chain.
+Returns with status code 401 Unauthorized.
