@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -88,6 +89,47 @@ public class UserRepositoryTests {
 
             //Assert
             assertThat(exists).isFalse();
+        }
+
+    }
+
+    @Nested
+    @DisplayName("deleteDirectlyById tests")
+    class DeleteDirectlyByIdTests {
+
+        @Test
+        @DisplayName("Should delete the user by id when it exists")
+        void shouldDeleteUser_whenUserExists() {
+            //Arrange
+            User user = new User();
+            user.setUsername("username");
+            user.setPassword("password");
+            user = entityManager.persistAndFlush(user);
+            entityManager.clear();
+
+            //Act
+            userRepository.deleteDirectlyById(user.getId());
+
+            //Assert
+            assertThat(entityManager.find(User.class, user.getId())).isNull();
+        }
+
+        @Test
+        @DisplayName("Should do nothing if user does not exist")
+        void shouldDoNothing_whenUserDoesNotExist() {
+            //Arrange
+            User user = new User();
+            user.setUsername("username");
+            user.setPassword("password");
+            User newUser = entityManager.persistAndFlush(user);
+            entityManager.remove(newUser);
+            entityManager.flush();
+
+            //Act and Assert
+            assertThatCode(() -> userRepository.deleteDirectlyById(newUser.getId()))
+                .doesNotThrowAnyException();
+
+            assertThat(entityManager.find(User.class, user.getId())).isNull();
         }
 
     }
