@@ -1,6 +1,7 @@
 package io.github.khaytul_illia.book_catalogue_api.book;
 
 import io.github.khaytul_illia.book_catalogue_api.book.request.BookCreateRequest;
+import io.github.khaytul_illia.book_catalogue_api.book.request.BookUpdateRequest;
 import io.github.khaytul_illia.book_catalogue_api.book.response.BookResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -125,6 +127,99 @@ public class BookControllerTests {
                 .andExpect(jsonPath("$.data.releaseDate").value("must be a date in the past or in the present"));
 
             verify(bookService, never()).createBook(any(BookCreateRequest.class));
+        }
+
+    }
+
+    @Nested
+    @DisplayName("updateBook tests")
+    class UpdateBookTests{
+
+        @Test
+        @DisplayName("Should return 200 Ok when request is valid")
+        void shouldReturn200_whenValidRequest() throws Exception{
+            //Arrange
+            long bookId = 1;
+            BookUpdateRequest request = new BookUpdateRequest(
+                "Cool Book Vol.1",
+                null,
+                "Not An Author",
+                null,
+                null
+            );
+            BookResponse response = new BookResponse(
+                1L,
+                "Cool Book Vol.1",
+                "Lorem ipsum dolor sit amet",
+                "Not An Author",
+                200,
+                LocalDate.parse("2020-08-10")
+            );
+
+            when(bookService.updateBook(anyLong(), any(BookUpdateRequest.class)))
+                .thenReturn(response);
+
+            //Act and Assert
+            mockMvc.perform(
+                    patch("/books/{bookId}", bookId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(response.id()))
+                .andExpect(jsonPath("$.title").value(response.title()))
+                .andExpect(jsonPath("$.author").value(response.author()));
+
+            verify(bookService).updateBook(anyLong(), any(BookUpdateRequest.class));
+        }
+
+        @Test
+        @DisplayName("Should return 400 Bad Request when path variable is invalid")
+        void shouldReturn400_whenPathVariableInvalid() throws Exception{
+            //Arrange
+            long bookId = -1;
+            BookUpdateRequest request = new BookUpdateRequest(null, null, null, null, null);
+
+            //Act and Assert
+            mockMvc.perform(
+                    patch("/books/{bookId}", bookId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
+                .andExpect(jsonPath("$.data.bookId").value("must be greater than 0"));
+
+            verify(bookService, never()).updateBook(anyLong(), any(BookUpdateRequest.class));
+        }
+
+        @Test
+        @DisplayName("Should return 400 Bad Request when request fields are invalid")
+        void shouldReturn400_whenRequestInvalid() throws Exception{
+            //Arrange
+            long bookId = 1;
+            BookUpdateRequest request = new BookUpdateRequest(
+                "",
+                null,
+                "",
+                -1,
+                LocalDate.now().plusYears(1)
+            );
+
+            //Act and Assert
+            mockMvc.perform(
+                    patch("/books/{bookId}", bookId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
+                .andExpect(jsonPath("$.data.title").value("size must be between 1 and 100"))
+                .andExpect(jsonPath("$.data.author").value("size must be between 1 and 50"))
+                .andExpect(jsonPath("$.data.pages").value("must be greater than or equal to 0"))
+                .andExpect(jsonPath("$.data.releaseDate").value("must be a date in the past or in the present"));
+
+            verify(bookService, never()).updateBook(anyLong(), any(BookUpdateRequest.class));
         }
 
     }
