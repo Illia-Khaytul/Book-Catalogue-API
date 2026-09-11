@@ -45,7 +45,7 @@ public class BookService {
         return new BookResponse(book);
     }
 
-    @Retryable(includes = OptimisticLockingFailureException.class, maxRetriesString = "${spring.application.retries.update-book.max")
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetriesString = "${spring.application.retries.update-book.max}")
     public BookResponse updateBook(long bookId, BookUpdateRequest request) {
         log.info("Updating book with id {}", bookId);
 
