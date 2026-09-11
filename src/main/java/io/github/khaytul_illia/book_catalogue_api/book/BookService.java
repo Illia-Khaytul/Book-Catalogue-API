@@ -104,6 +104,11 @@ public class BookService {
     public void deleteBook(long bookId) {
         log.info("Deleting book with id {}", bookId);
 
+        log.debug("Checking if a book with the provided id exists");
+        if(!bookRepository.existsById(bookId)){
+            throw new EntityNotFoundException("Book with id '%s' does not exist", bookId);
+        }
+
         log.debug("Deleting book");
         bookRepository.deleteBookDirectly(bookId);
 

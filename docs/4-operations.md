@@ -129,11 +129,13 @@ Deletes an existing book by provided id.
 **Receives:** long `bookId`
 
 **Steps:**
-1Delete book by id.
+1. Check if a book exists by id. Throws `not found exception`.
+2. Delete book by id.
 
 **Returns:** nothing
 
 Notes:
 - A normal deleteById method fetches the book before deletion to execute all entity lifecycle hooks (none present in this case).
-It will throw if no book with that id is found, which is not desired since the book will get deleted anyway.
-Use a modifying delete query to avoid loading the entity or performing additional existence checks.
+If the book gets deleted between the existence check and deletion the application will throw because no entity was found, which is not desired since the book will get deleted anyway.
+Use a modifying delete query to avoid this exception from being thrown.
+- An existence check is still necessary to notify the user if their operation was successful or not under normal circumstances.

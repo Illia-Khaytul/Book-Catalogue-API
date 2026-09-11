@@ -191,3 +191,4 @@ Every endpoint has a base path `/api/v1` and may throw with an error response `5
 **Error Responses:**
 - 400 Bad Request: request validation failed
 - 401 Unauthorized: invalid authentication
+- 404 Not Found: `not found exception`

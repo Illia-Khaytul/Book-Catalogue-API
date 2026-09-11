@@ -405,9 +405,27 @@ public class BookServiceTests {
         private final long bookId = 1;
 
         @Test
+        @DisplayName("Should throw EntityNotFoundException when book with id does not exist")
+        void shouldThrowEntityNotFoundException_whenBookDoesNotExist(){
+            //Arrange
+            when(bookRepository.existsById(bookId))
+                .thenReturn(false);
+
+            //Act and Assert
+            assertThatThrownBy(() -> bookService.deleteBook(bookId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("Book with id '%s' does not exist", bookId);
+
+            verify(bookRepository).existsById(bookId);
+            verify(bookRepository, never()).deleteBookDirectly(bookId);
+        }
+
+        @Test
         @DisplayName("Should delete book when book with id exists")
         void shouldDeleteBookById_whenBookExists(){
             //Arrange
+            when(bookRepository.existsById(bookId))
+                .thenReturn(true);
             doNothing().when(bookRepository)
                 .deleteBookDirectly(bookId);
 
@@ -415,6 +433,7 @@ public class BookServiceTests {
             bookService.deleteBook(bookId);
 
             //Assert
+            verify(bookRepository).existsById(bookId);
             verify(bookRepository).deleteBookDirectly(bookId);
         }
 
