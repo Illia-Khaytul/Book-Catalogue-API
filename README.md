@@ -202,3 +202,13 @@ mvn test
 ## 10. Design Documentation
 
 The design documentation is located at the [docs](/docs/1-overview.md) folder.
+
+## 11. Known Limitations
+
+This is a learning project and thus has several limitations and weaknesses preventing it from being production grade.
+
+The current API allows anyone to create a user and start editing the books. Normally this would be a security risk, but in this case it was an intentional decision. This project was kept intentionally simple for learning purposes while still showcasing the implementation of different technologies such as spring security.
+
+Password validation is also intentionally weak. For the small scope of this application it was not necessary to add complex password validation (Passay) aside from the current bean validation present in the dtos.
+
+Future updates to this project may include book ownership, roles and advanced password validation to enhance security.
