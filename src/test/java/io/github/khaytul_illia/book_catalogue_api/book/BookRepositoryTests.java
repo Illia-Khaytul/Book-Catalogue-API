@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -69,6 +70,47 @@ public class BookRepositoryTests {
 
             //Assert
             assertThat(exists).isFalse();
+        }
+
+    }
+
+    @Nested
+    @DisplayName("deleteBookDirectly tests")
+    class DeleteBookDirectlyTests{
+
+        @Test
+        @DisplayName("Should delete book by id when it exists")
+        void shouldDeleteBook_whenBookExists(){
+            //Arrange
+            Book book = new Book();
+            book.setTitle("Cool Book");
+            book.setAuthor("Original Author");
+            book = entityManager.persistAndFlush(book);
+
+            //Act
+            bookRepository.deleteBookDirectly(book.getId());
+            entityManager.clear();
+
+            //Assert
+            assertThat(entityManager.find(Book.class, book.getId())).isNull();
+        }
+
+        @Test
+        @DisplayName("Should do nothing when user does not exist")
+        void shouldDoNothing_whenBookDoesNotExist(){
+            //Arrange
+            Book book = new Book();
+            book.setTitle("Cool Book");
+            book.setAuthor("Original Author");
+            Book newBook = entityManager.persistAndFlush(book);
+            entityManager.remove(newBook);
+            entityManager.flush();
+
+            //Act and Assert
+            assertThatCode(() -> bookRepository.deleteBookDirectly(newBook.getId()))
+                .doesNotThrowAnyException();
+
+            assertThat(entityManager.find(Book.class, newBook.getId())).isNull();
         }
 
     }

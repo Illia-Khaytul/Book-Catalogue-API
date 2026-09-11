@@ -129,7 +129,7 @@ public class UserRepositoryTests {
             assertThatCode(() -> userRepository.deleteDirectlyById(newUser.getId()))
                 .doesNotThrowAnyException();
 
-            assertThat(entityManager.find(User.class, user.getId())).isNull();
+            assertThat(entityManager.find(User.class, newUser.getId())).isNull();
         }
 
     }

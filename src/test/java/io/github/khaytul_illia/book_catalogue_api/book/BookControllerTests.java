@@ -343,4 +343,46 @@ public class BookControllerTests {
         }
     }
 
+    @Nested
+    @DisplayName("deleteBook tests")
+    class DeleteBookTests{
+
+        @Test
+        @DisplayName("Should return 204 No Content when request is valid")
+        void shouldReturn204_whenValidRequest() throws Exception{
+            //Arrange
+            long bookId = 1;
+
+            doNothing().when(bookService)
+                .deleteBook(anyLong());
+
+            //Act and Assert
+            mockMvc.perform(
+                    delete("/books/{bookId}", bookId)
+                )
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+
+            verify(bookService).deleteBook(anyLong());
+        }
+
+        @Test
+        @DisplayName("Should return 400 Bad Request when path variable is invalid")
+        void shouldReturn400_whenPathVariableInvalid() throws Exception{
+            //Arrange
+            long bookId = -1;
+
+            //Act and Assert
+            mockMvc.perform(
+                    delete("/books/{bookId}", bookId)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
+                .andExpect(jsonPath("$.data.bookId").value("must be greater than 0"));
+
+            verify(bookService, never()).deleteBook(anyLong());
+        }
+
+    }
+
 }

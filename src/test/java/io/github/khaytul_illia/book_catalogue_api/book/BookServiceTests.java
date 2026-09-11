@@ -398,4 +398,28 @@ public class BookServiceTests {
 
     }
 
+    @Nested
+    @DisplayName("deleteBook tests")
+    class DeleteBookTests{
+
+        private final long bookId = 1;
+
+        @Test
+        @DisplayName("Should delete book when book with id exists")
+        void shouldDeleteBookById_whenBookExists(){
+            //Arrange
+            when(bookRepository.existsById(bookId))
+                .thenReturn(true);
+            doNothing().when(bookRepository)
+                .deleteBookDirectly(bookId);
+
+            //Act
+            bookService.deleteBook(bookId);
+
+            //Assert
+            verify(bookRepository).deleteBookDirectly(bookId);
+        }
+
+    }
+
 }
