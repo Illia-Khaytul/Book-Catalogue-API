@@ -408,8 +408,6 @@ public class BookServiceTests {
         @DisplayName("Should delete book when book with id exists")
         void shouldDeleteBookById_whenBookExists(){
             //Arrange
-            when(bookRepository.existsById(bookId))
-                .thenReturn(true);
             doNothing().when(bookRepository)
                 .deleteBookDirectly(bookId);
 
