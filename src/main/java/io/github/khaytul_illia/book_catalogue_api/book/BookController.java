@@ -50,10 +50,11 @@ public class BookController {
     }
 
     @GetMapping(path = "/{bookId}")
+    @ResponseStatus(HttpStatus.OK)
     public BookResponse getBook(
-        @PathVariable long bookId
+        @Valid @Positive @PathVariable long bookId
     ){
-        return null;
+        return bookService.getBook(bookId);
     }
 
     @GetMapping(path = "")

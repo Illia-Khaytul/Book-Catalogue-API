@@ -72,7 +72,15 @@ public class BookService {
     }
 
     public BookResponse getBook(long bookId) {
-        return null;
+        log.info("Getting book with id {}", bookId);
+
+        log.debug("Fetching the book by provided id");
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new EntityNotFoundException("Book with id '%s' does not exist", bookId));
+
+        log.info("Book found successfully");
+
+        return new BookResponse(book);
     }
 
     public PaginatedResponse<BookResponse> getBooks(BookFiltering filtering, Pageable pagination) {
