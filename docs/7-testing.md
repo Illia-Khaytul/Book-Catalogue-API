@@ -52,3 +52,15 @@ Loads only the database layer of the application and the required services `Book
 The tested behavior is located very close to the persistence layer, so there is no need to initialize the full context.
 
 Focus on testing if the generated specifications produce the required results.
+
+**End to end IT**
+
+Loads the full application with a random port (`webEnvironment = RANDOM_PORT`) to test how the application works all together.
+
+Utilizes `TestRestClient` to test the api.
+
+Focus on the correct function (happy path) of each endpoint and the return of the appropriate error responses in case of failure (error path).
+
+Since most endpoints require authentication it is necessary to have a user present in the database.
+Persisting a user requires password encoding with an injected `PasswordEncoder`.
+To avoid unnecessary overhead of password encoding before each test, the test's lifecycle is set to `PER_CLASS` and the password is encoded once before all tests.
