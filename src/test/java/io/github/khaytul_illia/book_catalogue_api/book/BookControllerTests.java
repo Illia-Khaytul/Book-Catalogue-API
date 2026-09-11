@@ -20,8 +20,8 @@ import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -220,6 +220,58 @@ public class BookControllerTests {
                 .andExpect(jsonPath("$.data.releaseDate").value("must be a date in the past or in the present"));
 
             verify(bookService, never()).updateBook(anyLong(), any(BookUpdateRequest.class));
+        }
+
+    }
+
+    @Nested
+    @DisplayName("getBook tests")
+    class GetBookTests{
+
+        @Test
+        @DisplayName("Should return 200 Ok when request is valid")
+        void shouldReturn200_whenValidRequest() throws Exception{
+            //Arrange
+            long bookId = 1;
+            BookResponse response = new BookResponse(
+                1L,
+                "Cool Book Vol.1",
+                "Lorem ipsum dolor sit amet",
+                "Not An Author",
+                200,
+                LocalDate.parse("2020-08-10")
+            );
+
+            when(bookService.getBook(anyLong()))
+                .thenReturn(response);
+
+            //Act and Assert
+            mockMvc.perform(
+                    get("/books/{bookId}", bookId)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(response.id()))
+                .andExpect(jsonPath("$.title").value(response.title()))
+                .andExpect(jsonPath("$.author").value(response.author()));
+
+            verify(bookService).getBook(anyLong());
+        }
+
+        @Test
+        @DisplayName("Should return 400 Bad Request when path variable is invalid")
+        void shouldReturn400_whenPathVariableInvalid() throws Exception{
+            //Arrange
+            long bookId = -1;
+
+            //Act and Assert
+            mockMvc.perform(
+                    get("/books/{bookId}", bookId)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
+                .andExpect(jsonPath("$.data.bookId").value("must be greater than 0"));
+
+            verify(bookService, never()).getBook(anyLong());
         }
 
     }

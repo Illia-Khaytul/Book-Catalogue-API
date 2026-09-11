@@ -282,4 +282,59 @@ public class BookServiceTests {
 
     }
 
+    @Nested
+    @DisplayName("getBook tests")
+    class GetBookTests{
+
+        private final long bookId = 1;
+
+        @Test
+        @DisplayName("Should throw EntityNotFoundException when book not found by id")
+        void shouldThrowEntityNotFoundException_whenBookIsNotFound(){
+            //Arrange
+            when(bookRepository.findById(bookId))
+                .thenReturn(Optional.empty());
+
+            //Act and Assert
+            assertThatThrownBy(() -> bookService.getBook(bookId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessageContaining("Book with id '%s' does not exist", bookId);
+
+            verify(bookRepository).findById(bookId);
+        }
+
+        @Test
+        @DisplayName("Should return found book response when book is found by id")
+        void shouldReturnResponse_whenBookIsFound(){
+            //Arrange
+            Book foundBook = new Book(
+                1L,
+                "Cool Book Vol.1",
+                "Lorem ipsum dolor sit amet",
+                "Not An Author",
+                200,
+                LocalDate.parse("2020-08-10"),
+                1
+            );
+
+            when(bookRepository.findById(bookId))
+                .thenReturn(Optional.of(foundBook));
+
+            //Act
+            BookResponse response = bookService.getBook(bookId);
+
+            //Assert
+            assertThat(response).isNotNull();
+            assertThat(response.id()).isEqualTo(foundBook.getId());
+            assertThat(response.title()).isEqualTo(foundBook.getTitle());
+            assertThat(response.description()).isEqualTo(foundBook.getDescription());
+            assertThat(response.author()).isEqualTo(foundBook.getAuthor());
+            assertThat(response.pages()).isEqualTo(foundBook.getPages());
+            assertThat(response.releaseDate()).isEqualTo(foundBook.getReleaseDate());
+
+            verify(bookRepository).findById(bookId);
+        }
+
+    }
+
 }
