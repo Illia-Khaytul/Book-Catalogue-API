@@ -6,8 +6,11 @@ import io.github.khaytul_illia.book_catalogue_api.book.request.BookUpdateRequest
 import io.github.khaytul_illia.book_catalogue_api.book.response.BookResponse;
 import io.github.khaytul_illia.book_catalogue_api.common.pagination.PaginatedResponse;
 import io.github.khaytul_illia.book_catalogue_api.exception.DuplicateEntryException;
+import io.github.khaytul_illia.book_catalogue_api.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,8 +41,34 @@ public class BookService {
         return new BookResponse(book);
     }
 
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetriesString = "${spring.application.retries.update-book.max")
     public BookResponse updateBook(long bookId, BookUpdateRequest request) {
-        return null;
+        log.info("Updating book with id {}", bookId);
+
+        log.debug("Fetching book by provided id");
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new EntityNotFoundException("Book with id '%s' does not exist", bookId));
+
+        if(request.isEmpty()){
+            log.info("No book fields to update");
+            return new BookResponse(book);
+        }
+
+        log.debug("Checking if a book with the new title and author already exists");
+        String title = request.title() == null ? book.getTitle() : request.title();
+        String author = request.author() == null ? book.getAuthor() : request.author();
+        if(!(book.getTitle().equals(title) && book.getAuthor().equals(author)) && bookRepository.existsByTitleAndAuthor(title, author)){
+            throw new DuplicateEntryException("A book with title '%s' by '%s' already exists", title, author);
+        }
+
+        log.debug("Updating book with provided data");
+        updateBookFromRequest(book, request);
+
+        book = bookRepository.save(book);
+
+        log.info("Book successfully updated");
+
+        return new BookResponse(book);
     }
 
     public BookResponse getBook(long bookId) {
@@ -67,6 +96,14 @@ public class BookService {
         book.setReleaseDate(request.releaseDate());
 
         return book;
+    }
+
+    private void updateBookFromRequest(Book book, BookUpdateRequest request){
+        book.setTitle(request.title() == null ? book.getTitle() : request.title());
+        book.setDescription(request.description() == null ? book.getDescription() : request.description());
+        book.setAuthor(request.author() == null ? book.getAuthor() : request.author());
+        book.setPages(request.pages() == null ? book.getPages() : request.pages());
+        book.setReleaseDate(request.releaseDate() == null ? book.getReleaseDate() : request.releaseDate());
     }
 
 }

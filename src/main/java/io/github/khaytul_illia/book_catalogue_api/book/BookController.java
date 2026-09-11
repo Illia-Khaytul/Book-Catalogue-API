@@ -5,7 +5,10 @@ import io.github.khaytul_illia.book_catalogue_api.book.request.BookFiltering;
 import io.github.khaytul_illia.book_catalogue_api.book.request.BookUpdateRequest;
 import io.github.khaytul_illia.book_catalogue_api.book.response.BookResponse;
 import io.github.khaytul_illia.book_catalogue_api.common.pagination.PaginatedResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,11 +41,12 @@ public class BookController {
     }
 
     @PatchMapping(path = "/{bookId}")
+    @ResponseStatus(HttpStatus.OK)
     public BookResponse updateBook(
-        @PathVariable long bookId,
-        @RequestBody BookUpdateRequest request
+        @Valid @Positive @PathVariable long bookId,
+        @Validated @RequestBody BookUpdateRequest request
     ){
-        return null;
+        return bookService.updateBook(bookId, request);
     }
 
     @GetMapping(path = "/{bookId}")
