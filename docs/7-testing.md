@@ -38,4 +38,17 @@ Focus on the correct operation of custom and derived repository methods.
 
 ## 3. Integration tests
 
-Integration tests for component interactions and functionality that cannot be tested in isolation and full end to end application tests.
+Integration tests for retriable `updateBook` and BookSpecificationsBuilder for `getBooks` (cannot be properly verified with unit tests), as well as end to end tests for the full api.
+
+**Retriable book update IT**
+
+Loads the full application with no web layer (`webEnvironment = NONE`) to allow Spring AOP to successfully create the retry proxy.
+
+Focus on the correct retry operation of the method and not on the correct transactional rollback, load new entity, try again behavior since it is not possible to accurately simulate the necessary concurrent modification conditions to trigger the retry requirements.
+
+**BookSpecificationBuilder IT**
+
+Loads only the database layer of the application and the required services `BookService`and `BookSpecificationBuilder`. 
+The tested behavior is located very close to the persistence layer, so there is no need to initialize the full context.
+
+Focus on testing if the generated specifications produce the required results.
