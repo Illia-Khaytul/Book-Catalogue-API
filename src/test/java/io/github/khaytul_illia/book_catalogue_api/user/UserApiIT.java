@@ -197,6 +197,7 @@ public class UserApiIT {
             restClient
                 .get()
                 .uri("/something")
+                .headers(httpHeaders -> httpHeaders.putAll(headers))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorResponse.class).value(response -> {
