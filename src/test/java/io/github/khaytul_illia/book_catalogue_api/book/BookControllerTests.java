@@ -1,8 +1,10 @@
 package io.github.khaytul_illia.book_catalogue_api.book;
 
 import io.github.khaytul_illia.book_catalogue_api.book.request.BookCreateRequest;
+import io.github.khaytul_illia.book_catalogue_api.book.request.BookFiltering;
 import io.github.khaytul_illia.book_catalogue_api.book.request.BookUpdateRequest;
 import io.github.khaytul_illia.book_catalogue_api.book.response.BookResponse;
+import io.github.khaytul_illia.book_catalogue_api.common.pagination.PaginatedResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,13 +12,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.MultiValueMap;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -274,6 +281,66 @@ public class BookControllerTests {
             verify(bookService, never()).getBook(anyLong());
         }
 
+    }
+
+    @Nested
+    @DisplayName("getBooks tests")
+    class GetBooksTests{
+
+        @Test
+        @DisplayName("Should return 200 Ok when request is valid")
+        void shouldReturn200_whenValidRequest() throws Exception{
+            //Arrange
+            BookResponse book = new BookResponse(
+                1L,
+                "Cool Book Vol.1",
+                "Lorem ipsum dolor sit amet",
+                "Not An Author",
+                200,
+                LocalDate.parse("2020-08-10")
+            );
+            PaginatedResponse<BookResponse> response = new PaginatedResponse<>(new PageImpl<>(List.of(book)));
+
+            when(bookService.getBooks(any(BookFiltering.class), any(Pageable.class)))
+                .thenReturn(response);
+
+            //Act and Assert
+            mockMvc.perform(
+                    get("/books")
+                        .queryParams(MultiValueMap.fromSingleValue(Map.of(
+                            "titleContains", "Book"
+                        )))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(book.id()));
+
+            verify(bookService).getBooks(any(BookFiltering.class), any(Pageable.class));
+        }
+
+        @Test
+        @DisplayName("Should return 400 Bad Request when query parameters are invalid")
+        void shouldReturn400_whenQueryParametersInvalid() throws Exception{
+            //Act and Assert
+            mockMvc.perform(
+                    get("/books")
+                        .queryParams(MultiValueMap.fromSingleValue(Map.of(
+                            "titleContains", "",
+                            "authorName", "",
+                            "minPages", "-1",
+                            "maxPages", "-1",
+                            "releasedAfter", "2050-01-01"
+                        )))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
+                .andExpect(jsonPath("$.data.titleContains").value("size must be between 1 and 100"))
+                .andExpect(jsonPath("$.data.authorName").value("size must be between 1 and 50"))
+                .andExpect(jsonPath("$.data.minPages").value("must be greater than or equal to 0"))
+                .andExpect(jsonPath("$.data.maxPages").value("must be greater than or equal to 0"))
+                .andExpect(jsonPath("$.data.releasedAfter").value("must be a date in the past or in the present"));
+
+            verify(bookService, never()).getBooks(any(BookFiltering.class), any(Pageable.class));
+        }
     }
 
 }

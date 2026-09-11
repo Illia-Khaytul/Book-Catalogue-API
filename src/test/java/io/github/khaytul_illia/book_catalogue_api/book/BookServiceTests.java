@@ -1,8 +1,10 @@
 package io.github.khaytul_illia.book_catalogue_api.book;
 
 import io.github.khaytul_illia.book_catalogue_api.book.request.BookCreateRequest;
+import io.github.khaytul_illia.book_catalogue_api.book.request.BookFiltering;
 import io.github.khaytul_illia.book_catalogue_api.book.request.BookUpdateRequest;
 import io.github.khaytul_illia.book_catalogue_api.book.response.BookResponse;
+import io.github.khaytul_illia.book_catalogue_api.common.pagination.PaginatedResponse;
 import io.github.khaytul_illia.book_catalogue_api.exception.DuplicateEntryException;
 import io.github.khaytul_illia.book_catalogue_api.exception.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +15,14 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +36,8 @@ public class BookServiceTests {
 
     @Mock
     private BookRepository bookRepository;
+    @Mock
+    private BookSpecificationBuilder bookSpecificationBuilder;
     @InjectMocks
     private BookService bookService;
 
@@ -333,6 +343,57 @@ public class BookServiceTests {
             assertThat(response.releaseDate()).isEqualTo(foundBook.getReleaseDate());
 
             verify(bookRepository).findById(bookId);
+        }
+
+    }
+
+    @Nested
+    @DisplayName("getBooks tests")
+    class GetBooksTests{
+
+        private final Pageable pagination = PageRequest.of(0, 10);
+        private final BookFiltering filtering = new BookFiltering("Book", null, null, null, null, null);
+
+        @Test
+        @DisplayName("Should build specification and return mapped book page")
+        void shouldReturnMappedPageOfBooks(){
+            //Arrange
+            Specification<Book> spec = mock(Specification.class);
+            Book foundBook = new Book(
+                1L,
+                "Cool Book Vol.1",
+                "Lorem ipsum dolor sit amet",
+                "Not An Author",
+                200,
+                LocalDate.parse("2020-08-10"),
+                1
+            );
+            Page<Book> foundPage = new PageImpl<>(List.of(foundBook), pagination, 1);
+
+            when(bookSpecificationBuilder.fromFilter(filtering))
+                .thenReturn(spec);
+            when(bookRepository.findAll(spec, pagination))
+                .thenReturn(foundPage);
+
+            //Act
+            PaginatedResponse<BookResponse> response = bookService.getBooks(filtering, pagination);
+
+            //Assert
+            assertThat(response).isNotNull();
+            assertThat(response.page()).isEqualTo(foundPage.getNumber());
+            assertThat(response.totalPages()).isEqualTo(foundPage.getTotalPages());
+            assertThat(response.pageSize()).isEqualTo(foundPage.getSize());
+            assertThat(response.totalElements()).isEqualTo(foundPage.getTotalElements());
+            assertThat(response.content()).hasSize(foundPage.getContent().size());
+
+            BookResponse bookResponse = response.content().getFirst();
+            assertThat(bookResponse).isNotNull();
+            assertThat(bookResponse.id()).isEqualTo(foundBook.getId());
+            assertThat(bookResponse.title()).isEqualTo(foundBook.getTitle());
+            assertThat(bookResponse.author()).isEqualTo(foundBook.getAuthor());
+
+            verify(bookSpecificationBuilder).fromFilter(filtering);
+            verify(bookRepository).findAll(spec, pagination);
         }
 
     }
