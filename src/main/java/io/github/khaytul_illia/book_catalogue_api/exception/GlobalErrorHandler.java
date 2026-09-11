@@ -58,7 +58,7 @@ public class GlobalErrorHandler {
 
         return new ErrorResponse(
             HttpStatus.UNAUTHORIZED,
-            "User is not authenticated"
+            "Full authentication is required to access this resource"
         );
     }
 
