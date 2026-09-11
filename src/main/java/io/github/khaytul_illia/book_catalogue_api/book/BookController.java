@@ -6,7 +6,10 @@ import io.github.khaytul_illia.book_catalogue_api.book.request.BookUpdateRequest
 import io.github.khaytul_illia.book_catalogue_api.book.response.BookResponse;
 import io.github.khaytul_illia.book_catalogue_api.common.pagination.PaginatedResponse;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping(path = "/books")
@@ -19,10 +22,19 @@ public class BookController {
     }
 
     @PostMapping(path = "")
-    public BookResponse createBook(
-        @RequestBody BookCreateRequest request
+    public ResponseEntity<BookResponse> createBook(
+        @Validated @RequestBody BookCreateRequest request
     ){
-        return null;
+        BookResponse response = bookService.createBook(request);
+
+        return ResponseEntity
+            .created(ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .path("/{bookId}")
+                .buildAndExpand(response.id())
+                .toUri()
+            )
+            .body(response);
     }
 
     @PatchMapping(path = "/{bookId}")
