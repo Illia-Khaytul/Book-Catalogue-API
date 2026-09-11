@@ -107,7 +107,7 @@ public class GlobalExceptionErrorTests {
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_UNAUTHORIZED))
-            .andExpect(jsonPath("$.message").value("User is not authenticated"))
+            .andExpect(jsonPath("$.message").value("Full authentication is required to access this resource"))
             .andExpect(jsonPath("$.data").isEmpty());
     }
 
