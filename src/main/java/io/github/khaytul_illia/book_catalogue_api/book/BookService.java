@@ -101,8 +101,13 @@ public class BookService {
         return new PaginatedResponse<>(bookPage.map(BookResponse::new));
     }
 
-    public BookResponse deleteBook(long bookId) {
-        return null;
+    public void deleteBook(long bookId) {
+        log.info("Deleting book with id {}", bookId);
+
+        log.debug("Deleting book");
+        bookRepository.deleteBookDirectly(bookId);
+
+        log.info("Book deleted successfully");
     }
 
     /*

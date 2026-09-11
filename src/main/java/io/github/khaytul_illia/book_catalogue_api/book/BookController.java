@@ -69,10 +69,11 @@ public class BookController {
     }
 
     @DeleteMapping(path = "/{bookId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBook(
-        @PathVariable long bookId
+        @Valid @Positive @PathVariable long bookId
     ){
-
+        bookService.deleteBook(bookId);
     }
 
 }
