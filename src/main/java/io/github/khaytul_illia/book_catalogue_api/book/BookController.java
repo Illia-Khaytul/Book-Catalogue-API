@@ -8,6 +8,8 @@ import io.github.khaytul_illia.book_catalogue_api.common.pagination.PaginatedRes
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -58,11 +60,12 @@ public class BookController {
     }
 
     @GetMapping(path = "")
+    @ResponseStatus(HttpStatus.OK)
     public PaginatedResponse<BookResponse> getBooks(
-        Pageable pagination,
-        @ModelAttribute BookFiltering filtering
+        @PageableDefault(page = 0, size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pagination,
+        @Validated @ModelAttribute BookFiltering filtering
     ){
-        return null;
+        return bookService.getBooks(filtering, pagination);
     }
 
     @DeleteMapping(path = "/{bookId}")

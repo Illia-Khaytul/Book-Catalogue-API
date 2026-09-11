@@ -9,7 +9,9 @@ import io.github.khaytul_illia.book_catalogue_api.exception.DuplicateEntryExcept
 import io.github.khaytul_illia.book_catalogue_api.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +20,11 @@ import org.springframework.stereotype.Service;
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final BookSpecificationBuilder bookSpecificationBuilder;
 
-    public BookService(BookRepository bookRepository){
+    public BookService(BookRepository bookRepository, BookSpecificationBuilder bookSpecificationBuilder){
         this.bookRepository = bookRepository;
+        this.bookSpecificationBuilder = bookSpecificationBuilder;
     }
 
     public BookResponse createBook(BookCreateRequest request) {
@@ -84,7 +88,17 @@ public class BookService {
     }
 
     public PaginatedResponse<BookResponse> getBooks(BookFiltering filtering, Pageable pagination) {
-        return null;
+        log.info("Getting books with provided pagination and filters");
+
+        log.debug("Building filters with provided data");
+        Specification<Book> filter = bookSpecificationBuilder.fromFilter(filtering);
+
+        log.debug("Fetching a page of books with provided pagination and filters");
+        Page<Book> bookPage = bookRepository.findAll(filter, pagination);
+
+        log.info("Successfully found {} books for {} pages", bookPage.getTotalElements(), bookPage.getTotalPages());
+
+        return new PaginatedResponse<>(bookPage.map(BookResponse::new));
     }
 
     public BookResponse deleteBook(long bookId) {
