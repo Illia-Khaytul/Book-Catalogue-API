@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -21,8 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DummyController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
-@DisplayName("GlobalExceptionHandler tests")
-public class GlobalExceptionHandlerTests {
+@DisplayName("GlobalErrorHandler tests")
+public class GlobalExceptionErrorTests {
 
     @MockitoSpyBean
     private DummyController dummyController;
@@ -31,6 +32,84 @@ public class GlobalExceptionHandlerTests {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Test
+    @DisplayName("Should return 409 Conflict when caught DuplicateEntryException")
+    void shouldReturn409_whenCaughtDuplicateEntryException() throws Exception{
+        //Arrange
+        DuplicateEntryException exception = new DuplicateEntryException("message");
+
+        doThrow(exception)
+            .when(dummyController).dummyOperation();
+
+        //Act and Assert
+        mockMvc.perform(
+                get("/dummy/{id}", 1)
+            )
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.timestamp").isNotEmpty())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_CONFLICT))
+            .andExpect(jsonPath("$.message").value(exception.getMessage()))
+            .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should return 404 Not Found when caught EntityNotFoundException")
+    void shouldReturn404_whenCaughtEntityNotFoundException() throws Exception{
+        //Arrange
+        EntityNotFoundException exception = new EntityNotFoundException("message");
+
+        doThrow(exception)
+            .when(dummyController).dummyOperation();
+
+        //Act and Assert
+        mockMvc.perform(
+                get("/dummy/{id}", 1)
+            )
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.timestamp").isNotEmpty())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_NOT_FOUND))
+            .andExpect(jsonPath("$.message").value(exception.getMessage()))
+            .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request when caught InvalidPasswordException")
+    void shouldReturn400_whenCaughtInvalidPasswordException() throws Exception{
+        //Arrange
+        InvalidPasswordException exception = new InvalidPasswordException("message");
+
+        doThrow(exception)
+            .when(dummyController).dummyOperation();
+
+        //Act and Assert
+        mockMvc.perform(
+                get("/dummy/{id}", 1)
+            )
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.timestamp").isNotEmpty())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
+            .andExpect(jsonPath("$.message").value(exception.getMessage()))
+            .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should return 401 Unauthorized when caught UserNotAuthenticatedException")
+    void shouldReturn401_whenCaughtUserNotAuthenticatedException() throws Exception{
+        //Arrange
+        doThrow(new UserNotAuthenticatedException("message"))
+            .when(dummyController).dummyOperation();
+
+        //Act and Assert
+        mockMvc.perform(
+                get("/dummy/{id}", 1)
+            )
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.timestamp").isNotEmpty())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_UNAUTHORIZED))
+            .andExpect(jsonPath("$.message").value("User is not authenticated"))
+            .andExpect(jsonPath("$.data").isEmpty());
+    }
 
     @Test
     @DisplayName("Should return 400 Bad Request when caught MethodArgumentNotValidException")
@@ -75,6 +154,24 @@ public class GlobalExceptionHandlerTests {
             .andExpect(jsonPath("$.timestamp").isNotEmpty())
             .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_BAD_REQUEST))
             .andExpect(jsonPath("$.message").value("Invalid request body"))
+            .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when caught OptimisticLockingFailureException")
+    void shouldReturn409_whenCaughtOptimisticLockingFailureException() throws Exception{
+        //Arrange
+        doThrow(new OptimisticLockingFailureException("message"))
+            .when(dummyController).dummyOperation();
+
+        //Act and Assert
+        mockMvc.perform(
+                get("/dummy/{id}", 1)
+            )
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.timestamp").isNotEmpty())
+            .andExpect(jsonPath("$.status").value(HttpServletResponse.SC_CONFLICT))
+            .andExpect(jsonPath("$.message").value("Concurrent modification error"))
             .andExpect(jsonPath("$.data").isEmpty());
     }
 

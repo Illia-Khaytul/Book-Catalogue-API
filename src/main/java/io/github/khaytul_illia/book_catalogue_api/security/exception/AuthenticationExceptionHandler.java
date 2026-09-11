@@ -30,7 +30,7 @@ public class AuthenticationExceptionHandler implements AuthenticationEntryPoint 
         HttpServletResponse response,
         AuthenticationException e
     ) throws IOException, ServletException {
-        log.warn("{} - {}", e.getClass().getName(), e.getMessage());
+        log.warn("Caught {}: {}", e.getClass().getName(), e.getMessage());
 
         ErrorResponse errorResponse = new ErrorResponse(
             HttpStatus.UNAUTHORIZED,
