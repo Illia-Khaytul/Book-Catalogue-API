@@ -1,0 +1,92 @@
+package io.github.khaytul_illia.book_catalogue_api.book;
+
+import io.github.khaytul_illia.book_catalogue_api.TestcontainersConfiguration;
+import io.github.khaytul_illia.book_catalogue_api.book.request.BookUpdateRequest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@Import(TestcontainersConfiguration.class)
+@ActiveProfiles("test")
+@DisplayName("Book update retry logic integration tests")
+public class BookRetryableIT {
+
+    @MockitoBean
+    private BookRepository bookRepository;
+
+    @Autowired
+    private BookService bookService;
+
+    private final Book original = new Book(1L, "Cool Book Vol.1", null, "Original Author", null, null, null);
+    private final BookUpdateRequest request = new BookUpdateRequest(null, null, null, 0, null);
+
+    @BeforeEach
+    void beforeEach(){
+        //Arrange
+        when(bookRepository.findById(original.getId()))
+            .thenReturn(Optional.of(original));
+    }
+
+    @Test
+    @DisplayName("Should succeed when no OptimisticLockingFailureException is thrown")
+    void shouldSucceed_whenNoRetries(){
+        //Arrange
+        when(bookRepository.save(any(Book.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        //Act
+        bookService.updateBook(original.getId(), request);
+
+        //Assert
+        verify(bookRepository).findById(original.getId());
+        verify(bookRepository).save(any(Book.class));
+    }
+
+    @Test
+    @DisplayName("Should succeed when OptimisticLockingFailureException is thrown")
+    void shouldSucceed_whenOptimisticLockingFailureExceptionIsThrown(){
+        //Arrange
+        when(bookRepository.save(any(Book.class)))
+            .thenThrow(new OptimisticLockingFailureException("message"))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        //Act
+        bookService.updateBook(original.getId(), request);
+
+        //Assert
+        verify(bookRepository, times(2)).findById(original.getId());
+        verify(bookRepository, times(2)).save(any(Book.class));
+    }
+
+    @Test
+    @DisplayName("Should throw OptimisticLockingFailureException when no more retries available")
+    void shouldThrowOptimisticLockingFailureException_whenAllRetriesUsed(){
+        //Arrange
+        when(bookRepository.save(any(Book.class)))
+            .thenThrow(new OptimisticLockingFailureException("message"));
+
+        //Act and Assert
+        assertThatThrownBy(() -> bookService.updateBook(original.getId(), request))
+            .isInstanceOf(OptimisticLockingFailureException.class);
+
+        //Assert
+        verify(bookRepository, times(4)).findById(original.getId());
+        verify(bookRepository, times(4)).save(any(Book.class));
+    }
+
+}

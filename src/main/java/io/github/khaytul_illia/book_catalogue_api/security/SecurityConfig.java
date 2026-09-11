@@ -1,5 +1,6 @@
 package io.github.khaytul_illia.book_catalogue_api.security;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
+    @ConditionalOnWebApplication
     public SecurityFilterChain securityFilterChain(
         HttpSecurity http,
         AuthenticationEntryPoint authenticationEntryPoint
