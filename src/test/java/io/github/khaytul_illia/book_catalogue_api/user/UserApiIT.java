@@ -190,6 +190,23 @@ public class UserApiIT {
                 });
         }
 
+        @Test
+        @DisplayName("Should return 404 Not Found when accessing an endpoint that does not exist")
+        void shouldReturn404_whenEndpointDoesNotExist() {
+            //Act and Assert
+            restClient
+                .get()
+                .uri("/something")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorResponse.class).value(response -> {
+                    assertThat(response).isNotNull();
+                    assertThat(response.timestamp()).isNotNull();
+                    assertThat(response.status()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
+                    assertThat(response.message()).isEqualTo("Resource not found");
+                    assertThat(response.data()).isEmpty();
+                });
+        }
     }
 
 }

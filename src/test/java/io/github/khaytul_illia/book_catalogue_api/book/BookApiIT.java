@@ -398,6 +398,27 @@ public class BookApiIT {
                     assertThat(response.data()).isEmpty();
                 });
         }
+
+        @Test
+        @DisplayName("Should return 400 Bad Request when request body format is invalid")
+        void shouldReturn400_whenRequestBodyFormatInvalid(){
+            //Act and Assert
+            restClient
+                .post()
+                .uri("/books")
+                .headers(httpHeaders -> httpHeaders.putAll(headers))
+                .body("not a json")
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ErrorResponse.class).value(response -> {
+                    assertThat(response).isNotNull();
+                    assertThat(response.timestamp()).isNotNull();
+                    assertThat(response.status()).isEqualTo(HttpServletResponse.SC_BAD_REQUEST);
+                    assertThat(response.message()).isEqualTo("Invalid request body");
+                    assertThat(response.data()).isEmpty();
+                });
+        }
+
     }
 
 }
