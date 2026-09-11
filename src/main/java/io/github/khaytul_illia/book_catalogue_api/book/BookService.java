@@ -1,0 +1,141 @@
+package io.github.khaytul_illia.book_catalogue_api.book;
+
+import io.github.khaytul_illia.book_catalogue_api.book.request.BookCreateRequest;
+import io.github.khaytul_illia.book_catalogue_api.book.request.BookFiltering;
+import io.github.khaytul_illia.book_catalogue_api.book.request.BookUpdateRequest;
+import io.github.khaytul_illia.book_catalogue_api.book.response.BookResponse;
+import io.github.khaytul_illia.book_catalogue_api.common.pagination.PaginatedResponse;
+import io.github.khaytul_illia.book_catalogue_api.exception.DuplicateEntryException;
+import io.github.khaytul_illia.book_catalogue_api.exception.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.resilience.annotation.Retryable;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+public class BookService {
+
+    private final BookRepository bookRepository;
+    private final BookSpecificationBuilder bookSpecificationBuilder;
+
+    public BookService(BookRepository bookRepository, BookSpecificationBuilder bookSpecificationBuilder){
+        this.bookRepository = bookRepository;
+        this.bookSpecificationBuilder = bookSpecificationBuilder;
+    }
+
+    public BookResponse createBook(BookCreateRequest request) {
+        log.info("Creating new book with title '{}' by '{}'", request.title(), request.author());
+
+        log.debug("Checking if a book with this title and author already exists");
+        if(bookRepository.existsByTitleAndAuthor(request.title(), request.author())){
+            throw new DuplicateEntryException("A book with title '%s' by '%s' already exists", request.title(), request.author());
+        }
+
+        log.debug("Creating new book with provided data");
+        Book book = createBookFromRequest(request);
+
+        book = bookRepository.save(book);
+
+        log.info("New book successfully created with id {}", book.getId());
+
+        return new BookResponse(book);
+    }
+
+    @Retryable(includes = OptimisticLockingFailureException.class, maxRetriesString = "${spring.application.retries.update-book.max}")
+    public BookResponse updateBook(long bookId, BookUpdateRequest request) {
+        log.info("Updating book with id {}", bookId);
+
+        log.debug("Fetching book by provided id");
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new EntityNotFoundException("Book with id '%s' does not exist", bookId));
+
+        if(request.isEmpty()){
+            log.info("No book fields to update");
+            return new BookResponse(book);
+        }
+
+        log.debug("Checking if a book with the new title and author already exists");
+        String title = request.title() == null ? book.getTitle() : request.title();
+        String author = request.author() == null ? book.getAuthor() : request.author();
+        if(!(book.getTitle().equals(title) && book.getAuthor().equals(author)) && bookRepository.existsByTitleAndAuthor(title, author)){
+            throw new DuplicateEntryException("A book with title '%s' by '%s' already exists", title, author);
+        }
+
+        log.debug("Updating book with provided data");
+        updateBookFromRequest(book, request);
+
+        book = bookRepository.save(book);
+
+        log.info("Book successfully updated");
+
+        return new BookResponse(book);
+    }
+
+    public BookResponse getBook(long bookId) {
+        log.info("Getting book with id {}", bookId);
+
+        log.debug("Fetching the book by provided id");
+        Book book = bookRepository.findById(bookId)
+            .orElseThrow(() -> new EntityNotFoundException("Book with id '%s' does not exist", bookId));
+
+        log.info("Book found successfully");
+
+        return new BookResponse(book);
+    }
+
+    public PaginatedResponse<BookResponse> getBooks(BookFiltering filtering, Pageable pagination) {
+        log.info("Getting books with provided pagination and filters");
+
+        log.debug("Building filters with provided data");
+        Specification<Book> filter = bookSpecificationBuilder.fromFilter(filtering);
+
+        log.debug("Fetching a page of books with provided pagination and filters");
+        Page<Book> bookPage = bookRepository.findAll(filter, pagination);
+
+        log.info("Successfully found {} books for {} pages", bookPage.getTotalElements(), bookPage.getTotalPages());
+
+        return new PaginatedResponse<>(bookPage.map(BookResponse::new));
+    }
+
+    public void deleteBook(long bookId) {
+        log.info("Deleting book with id {}", bookId);
+
+        log.debug("Checking if a book with the provided id exists");
+        if(!bookRepository.existsById(bookId)){
+            throw new EntityNotFoundException("Book with id '%s' does not exist", bookId);
+        }
+
+        log.debug("Deleting book");
+        bookRepository.deleteBookDirectly(bookId);
+
+        log.info("Book deleted successfully");
+    }
+
+    /*
+            Helper methods
+    */
+
+    private Book createBookFromRequest(BookCreateRequest request){
+        Book book = new Book();
+        book.setTitle(request.title());
+        book.setDescription(request.description());
+        book.setAuthor(request.author());
+        book.setPages(request.pages());
+        book.setReleaseDate(request.releaseDate());
+
+        return book;
+    }
+
+    private void updateBookFromRequest(Book book, BookUpdateRequest request){
+        book.setTitle(request.title() == null ? book.getTitle() : request.title());
+        book.setDescription(request.description() == null ? book.getDescription() : request.description());
+        book.setAuthor(request.author() == null ? book.getAuthor() : request.author());
+        book.setPages(request.pages() == null ? book.getPages() : request.pages());
+        book.setReleaseDate(request.releaseDate() == null ? book.getReleaseDate() : request.releaseDate());
+    }
+
+}
