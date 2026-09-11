@@ -21,8 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DummyController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
-@DisplayName("GlobalExceptionHandler tests")
-public class GlobalExceptionHandlerTests {
+@DisplayName("GlobalErrorHandler tests")
+public class GlobalExceptionErrorTests {
 
     @MockitoSpyBean
     private DummyController dummyController;
