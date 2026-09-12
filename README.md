@@ -17,7 +17,7 @@ It also implements basic username-password security (HTTP Basic) and allows for 
 
 ## 2. Tech Stack
 
-- Spring Boot 4.1
+- Spring Boot 4.0.8
 - Spring Data JPA
 - Spring Web MVC
 - Spring Security
